@@ -7,3 +7,11 @@ Ensure you have `uv` installed and run `uv sync` to install necessary dependenci
 If a python virtual environment has not been activated for you; run `source .venv/bin/activate`.
 
 This project also uses `pre-commit` run `pre-commit install` to create the correct pre-commit git hooks.
+
+## Testing
+
+**PLEASE ENSURE DOCKER DESKTOP OR ANOTHER CONTAINERISATION ENGINE IS RUNNING BEFORE RUNNING TESTS!**
+
+Tests use [testcontainers](testcontainers.com) and [Playwright](https://playwright.dev/python/).
+
+To run all tests execute `$ uv run pytest -v`.
