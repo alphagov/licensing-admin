@@ -21,8 +21,4 @@ def django_server() -> Iterator[str]:
             .with_env("PYTHONUNBUFFERED", "1")
             .waiting_for(LogMessageWaitStrategy("Quit the server with CONTROL-C").with_startup_timeout(10))
         ) as container:
-            host = container.get_container_host_ip()
-            port = container.get_exposed_port(8000)
-            url = f"http://{host}:{port}/"
-
-            yield url
+            yield f"http://{container.get_container_host_ip()}:{container.get_exposed_port(8000)}/"
