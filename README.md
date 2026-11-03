@@ -14,4 +14,4 @@ This project also uses `pre-commit` run `pre-commit install` to create the corre
 
 Tests use [testcontainers](testcontainers.com) and [Playwright](https://playwright.dev/python/).
 
-To run all tests execute `$ uv run pytest -v`.
+To run all tests execute `$ make test`.
