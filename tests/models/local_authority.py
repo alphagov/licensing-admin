@@ -67,20 +67,19 @@ class LocalAuthority:
         client.close()
 
     def _to_json(self):
-        return json.dumps(
-            {
-                "agencyId": self.agency_id,
-                "authorityContactDetailsHolder": self.authority_contact_details_holder.to_json(),
-                "countries": [self.countries],
-                "fullName": self.full_name,
-                "imageBase64encoded": self.image_base_64_encoded,
-                "licenceDetails": [self.licence_details.to_json()],
-                "name": self.name,
-                "snacCodes": [self.snac_codes],
-                "urlSlug": self.url_slug,
-            }
-        )
+        return {
+            "agencyId": self.agency_id,
+            "authorityContactDetailsHolder": self.authority_contact_details_holder.to_json(),
+            "countries": [self.countries],
+            "fullName": self.full_name,
+            "imageBase64encoded": self.image_base_64_encoded,
+            "licenceDetails": [self.licence_details.to_json()],
+            "name": self.name,
+            "snacCodes": [self.snac_codes],
+            "urlSlug": self.url_slug,
+        }
 
     def is_equal_to_html_table_version(self, html_table: str) -> bool:
         table_json = HtmlTable.to_json(html_table)
         json.dumps(table_json, indent=2)
+        return False
