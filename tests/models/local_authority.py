@@ -1,0 +1,86 @@
+import base64
+import json
+import random
+
+from faker import Faker
+from models.html_table import HtmlTable
+from pymongo import MongoClient
+
+fake = Faker("en_GB")
+
+
+class AuthorityContactDetailsHolder:
+    def __init__(self):
+        fake.address()
+        self.line_one = f"{fake.building_number()} {fake.street_name()}"
+        self.line_two = fake.secondary_address()
+        self.line_3 = ""
+        self.city = fake.city()
+        self.postcode = fake.postcode()
+        self.phone_number = fake.phone_number()
+        self.email_address = fake.email()
+
+    def to_json(self):
+        return {
+            "lineOne": self.line_one,
+            "lineTwo": self.line_two,
+            "line3": self.line_3,
+            "city": self.city,
+            "postCode": self.postcode,
+            "phoneNumber": self.phone_number,
+            "emailAddress": self.email_address,
+        }
+
+
+class Licence:
+    def __init__(self):
+        self.licence_code = fake.numerify(text="####-#-#")
+        self.offered_by_authority = True
+        self.using_gov_uk = True
+        self.local_authority_url = fake.url()
+
+    def to_json(self):
+        return {
+            "licenceCode": self.licence_code,
+            "offeredByAuthority": self.offered_by_authority,
+            "usingGovUk": self.using_gov_uk,
+            "localAuthorityUrl": self.local_authority_url,
+        }
+
+
+class LocalAuthority:
+    def __init__(self, db_url: str, name: str):
+        self.agency_id = fake.random_int()
+        self.authority_contact_details_holder = AuthorityContactDetailsHolder()
+        self.countries = random.choice(["England", "Wales", "NI", "Scotland"])
+        self.full_name = name
+        self.image_base_64_encoded = base64.b64encode(fake.binary(length=32)).decode("utf-8")
+        self.licence_details = Licence()
+        self.name = name
+        self.snac_codes = fake.hexify(text="^^^^", upper=True)
+        self.url_slug = name.lower()
+        self.db_url = db_url
+
+    def save_in_database(self):
+        client = MongoClient(self.db_url)
+        client.get_default_database()["authorities"].insert_one(self._to_json())
+        client.close()
+
+    def _to_json(self):
+        return json.dumps(
+            {
+                "agencyId": self.agency_id,
+                "authorityContactDetailsHolder": self.authority_contact_details_holder.to_json(),
+                "countries": [self.countries],
+                "fullName": self.full_name,
+                "imageBase64encoded": self.image_base_64_encoded,
+                "licenceDetails": [self.licence_details.to_json()],
+                "name": self.name,
+                "snacCodes": [self.snac_codes],
+                "urlSlug": self.url_slug,
+            }
+        )
+
+    def is_equal_to_html_table_version(self, html_table: str) -> bool:
+        table_json = HtmlTable.to_json(html_table)
+        json.dumps(table_json, indent=2)

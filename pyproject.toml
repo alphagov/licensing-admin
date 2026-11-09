@@ -8,10 +8,14 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "beautifulsoup4>=4.15.0",
+    "faker>=40.44.0",
     "pre-commit>=4.6.0",
+    "pymongo>=4.19.0",
     "pytest-playwright>=0.10.0",
     "ruff>=0.15.22",
     "testcontainers>=4.15.0",
+    "testcontainers-mockserver>=9.2.0",
 ]
 
 [tool.ruff]

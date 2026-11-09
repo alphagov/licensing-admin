@@ -1,0 +1,19 @@
+[
+    {
+        "httpRequest": {
+            "method": "GET", 
+            "path": "/signon"
+        },
+        "httpResponse": {
+            "statusCode": 200, 
+            "body": {
+                "user":{
+                    "uid":"b63b35f6-cd59-43d3-919b-283f1ea3d39e",
+                    "name":"Bob McSuiggans",
+                    "email":"bobmcsuiggans@gmail.com",
+                    "permissions":{"Licensify":["signin"]}
+                }
+            }
+        }
+    }
+]
