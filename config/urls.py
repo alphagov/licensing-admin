@@ -15,10 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
+from django.views.generic import RedirectView
 
 from .views import hello_world
 
 urlpatterns = [
     path("", hello_world, name="hello_world"),
-]
+    path("assets/<path:path>", RedirectView.as_view(url="/static/assets/%(path)s", permanent=False)),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
