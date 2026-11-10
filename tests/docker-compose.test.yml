@@ -6,8 +6,13 @@ services:
     ports:
       - "8000"
     environment:
-      DATABASE_URL: "mongodb://docdb:password@document_db:10260/core_data?authSource=admin"
+      DOCUMENTDB_HOST: document_db
+      DOCUMENTDB_PORT: "10260"
+      DOCUMENTDB_USER: docdb
+      DOCUMENTDB_PASSWORD: password
+      DOCUMENTDB_ALLOW_INVALID_CERTS: "true"
       DJANGO_ALLOWED_HOSTS: "*"
+      IS_PRODUCTION: "false"
       GOVUK_SIGNON_URL: http://mockserver:1080
     depends_on:
       - mockserver
