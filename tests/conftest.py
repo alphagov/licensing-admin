@@ -1,6 +1,8 @@
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 
 import pytest
+from models.gov_uk_signon_mock import GovUkSignonMock
+from models.local_authority import LocalAuthorityFactory
 from playwright.sync_api import Page
 from testcontainers.compose import DockerCompose
 
@@ -23,21 +25,13 @@ def django_server(test_environment: DockerCompose) -> str:
 
 
 @pytest.fixture(scope="session")
-def login_page(test_environment: DockerCompose) -> str:
-    return f"http://localhost:{test_environment.get_service_port('django', 8000)}/login"
+def govuk_signon_mock(test_environment: DockerCompose) -> GovUkSignonMock:
+    return GovUkSignonMock("localhost", test_environment.get_service_port("mockserver", 1080))
 
 
 @pytest.fixture(scope="session")
-def authorities_page(test_environment: DockerCompose) -> str:
-    return f"http://localhost:{test_environment.get_service_port('django', 8000)}/authorities"
-
-
-@pytest.fixture(scope="session")
-def govuk_signon_mock(test_environment: DockerCompose) -> str:
-    return f"http://localhost:{test_environment.get_service_port('mockserver', 1080)}"
-
-
-@pytest.fixture(scope="session", autouse=True)
-def database_url(test_environment: DockerCompose) -> str:
+def local_authority_factory(test_environment: DockerCompose) -> Generator[LocalAuthorityFactory]:
     host_port = test_environment.get_service_port("document_db", 10260)
-    return f"mongodb://docdb:password@localhost:{host_port}/core_data?authSource=admin"
+    db_url = f"mongodb://docdb:password@localhost:{host_port}/core_data?authSource=admin"
+    with LocalAuthorityFactory(db_url) as factory:
+        yield factory

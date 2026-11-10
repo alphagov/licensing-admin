@@ -49,24 +49,18 @@ class Licence:
 
 
 class LocalAuthority:
-    def __init__(self, db_url: str, name: str):
+    def __init__(
+        self,
+    ):
         self.agency_id = fake.random_int()
         self.authority_contact_details_holder = AuthorityContactDetailsHolder()
         self.countries = random.choice(["England", "Wales", "NI", "Scotland"])
-        self.full_name = name
+        self.full_name = fake.county()
         self.image_base_64_encoded = base64.b64encode(fake.binary(length=32)).decode("utf-8")
         self.licence_details = Licence()
-        self.name = name
         self.snac_codes = fake.hexify(text="^^^^", upper=True)
-        self.url_slug = name.lower()
-        self.db_url = db_url
 
-    def save_in_database(self):
-        client = MongoClient(self.db_url)
-        client.get_default_database()["authorities"].insert_one(self._to_json())
-        client.close()
-
-    def _to_json(self):
+    def to_json(self):
         return {
             "agencyId": self.agency_id,
             "authorityContactDetailsHolder": self.authority_contact_details_holder.to_json(),
@@ -74,12 +68,33 @@ class LocalAuthority:
             "fullName": self.full_name,
             "imageBase64encoded": self.image_base_64_encoded,
             "licenceDetails": [self.licence_details.to_json()],
-            "name": self.name,
+            "name": self.full_name,
             "snacCodes": [self.snac_codes],
-            "urlSlug": self.url_slug,
+            "urlSlug": self.full_name.lower(),
         }
 
     def is_equal_to_html_table_version(self, html_table: str) -> bool:
         table_json = HtmlTable.to_json(html_table)
         json.dumps(table_json, indent=2)
         return False
+
+
+class LocalAuthorityFactory:
+    def __init__(self, db_url: str):
+        self._client = MongoClient(db_url)
+        self._database = self._client.get_default_database()["authorities"]
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._client.close()
+
+    def create_x(self, x: int) -> list[LocalAuthority]:
+        local_authorities_created = []
+        for _ in range(x):
+            local_authority = LocalAuthority()
+            self._database.insert_one(local_authority.to_json())
+            local_authorities_created.append(local_authority)
+
+        return local_authorities_created
