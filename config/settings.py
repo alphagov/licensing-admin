@@ -11,20 +11,25 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+sys.path.insert(0, str(BASE_DIR))
+sys.path.insert(0, str(BASE_DIR / "licensing_common"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-)_*-zeg)shi6!y!lufkmy_g8&6%s!0pk=d1erm)rgbchgqfa($"
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-)_*-zeg)shi6!y!lufkmy_g8&6%s!0pk=d1erm)rgbchgqfa($",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("IS_PRODUCTION", "true").lower() not in ["true", "1", "t", "yes"]
 
 ALLOWED_HOSTS = os.environ.get(
     "DJANGO_ALLOWED_HOSTS",
@@ -35,12 +40,12 @@ ALLOWED_HOSTS = os.environ.get(
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "common",
 ]
 
 MIDDLEWARE = [
@@ -76,13 +81,25 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+
+DOCUMENTDB_USER = os.getenv("DOCUMENTDB_USER", "docdb")
+DOCUMENTDB_PASSWORD = os.getenv("DOCUMENTDB_PASSWORD", "password")
+DOCUMENTDB_PORT = os.getenv("DOCUMENTDB_PORT", "10260")
+DOCUMENTDB_HOST = os.getenv("DOCUMENTDB_HOST", "localhost")
+DOCUMENTDB_CONN_ARGS = (
+    "tls=true&tlsAllowInvalidCertificates=true"
+    if os.getenv("DOCUMENTDB_ALLOW_INVALID_CERTS", "false").lower() in ["true", "1", "t", "yes"]
+    else "tls=true"
+)
+DOCUMENT_DB_CONN = (
+    f"mongodb://{DOCUMENTDB_USER}:{DOCUMENTDB_PASSWORD}@{DOCUMENTDB_HOST}:{DOCUMENTDB_PORT}?{DOCUMENTDB_CONN_ARGS}"
+)
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": {"ENGINE": "django_mongodb_backend", "NAME": "licensify", "HOST": f"{DOCUMENT_DB_CONN}"},
 }
 
+DEFAULT_AUTO_FIELD = "django_mongodb_backend.fields.ObjectIdAutoField"
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -119,13 +136,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = "static/"
-
-
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"

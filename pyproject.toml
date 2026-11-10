@@ -3,7 +3,9 @@ name = "licensing-admin"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
-    "django>=6.1.2",
+    "crispy-forms-gds~=2.0.1",
+    "django~=5.2.0",
+    "licensing_common",
 ]
 
 [dependency-groups]
@@ -43,3 +45,9 @@ extend-select = [
     "N804",
     "RUF100",
 ]
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+
+
+[tool.uv.sources]
+licensing_common = {path="./licensing_common", package= false}
