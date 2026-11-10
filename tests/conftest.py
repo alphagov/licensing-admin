@@ -32,6 +32,6 @@ def govuk_signon_mock(test_environment: DockerCompose) -> GovUkSignonMock:
 @pytest.fixture(scope="session")
 def local_authority_factory(test_environment: DockerCompose) -> Generator[LocalAuthorityFactory]:
     host_port = test_environment.get_service_port("document_db", 10260)
-    db_url = f"mongodb://docdb:password@localhost:{host_port}/core_data?authSource=admin"
+    db_url = f"mongodb://docdb:password@localhost:{host_port}/licensify?authSource=admin"
     with LocalAuthorityFactory(db_url) as factory:
         yield factory
