@@ -1,9 +1,7 @@
 import base64
-import json
 import random
 
 from faker import Faker
-from models.html_table import HtmlTable
 from pymongo import MongoClient
 
 fake = Faker("en_GB")
@@ -72,11 +70,6 @@ class LocalAuthority:
             "snacCodes": [self.snac_codes],
             "urlSlug": self.full_name.lower(),
         }
-
-    def is_equal_to_html_table_version(self, html_table: str) -> bool:
-        table_json = HtmlTable.to_json(html_table)
-        json.dumps(table_json, indent=2)
-        return False
 
 
 class LocalAuthorityFactory:

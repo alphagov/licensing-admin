@@ -1,31 +1,31 @@
+from helpers.list_helper import extract_values_and_sort_result
+from models.admin_app import AdminApp
 from models.gov_uk_signon_mock import GovUkSignonMock
 from models.local_authority import LocalAuthorityFactory
-from playwright.sync_api import Page, expect
 
 
-def test_has_title(page: Page, django_server: str) -> None:
-    page.goto(django_server)
-    expect(page).to_have_title("Hello World")
+def test_has_title(admin_app: AdminApp) -> None:
+    assert admin_app.current_page_title() == "Hello World"
 
 
 def test_gds_admin_can_view_all_authorities(
-    page: Page, django_server: str, local_authority_factory: LocalAuthorityFactory, govuk_signon_mock: GovUkSignonMock
+    admin_app: AdminApp, local_authority_factory: LocalAuthorityFactory, govuk_signon_mock: GovUkSignonMock
 ) -> None:
 
     # Given:
-    # - There is a GDS admin user available
     # - The database is populated with authorities
-    govuk_signon_mock.mock_gds_superuser_login()
     test_authorities = local_authority_factory.create_x(5)
 
     # When:
-    # - We go to the login page and login successfully as the GDS admin user
-    page.goto(f"{django_server}/login")
-    page.get_by_test_id("login").click()
+    # - We login as a GDS superadmin user
+    admin_app.login_as_gds_superadmin()
 
     # Then:
     # - The GOVUK Signon Login page should have been navigated to
-    # - The page that loads after sign-in should contain all the authorities from the database
     assert govuk_signon_mock.verify_login_page_navigated_to_x_times(1)
-    for authority in test_authorities:
-        assert authority.is_equal_to_html_table_version(page.get_by_test_id("authorities").inner_html())
+
+    # - The page that loads after sign-in should contain all expected authority details
+    authorities_rendered: list[dict[str, str]] = admin_app.convert_html_table_to_pythonic_data_structure("authorities")
+    authority_names_rendered: list[str] = extract_values_and_sort_result(authorities_rendered, "name")
+    test_authority_names: list[str] = extract_values_and_sort_result(test_authorities, "full_name")
+    assert authority_names_rendered == test_authority_names

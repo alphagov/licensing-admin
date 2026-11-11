@@ -1,6 +1,7 @@
 from collections.abc import Generator, Iterator
 
 import pytest
+from models.admin_app import AdminApp
 from models.gov_uk_signon_mock import GovUkSignonMock
 from models.local_authority import LocalAuthorityFactory
 from playwright.sync_api import Page
@@ -19,9 +20,9 @@ def test_environment() -> Iterator[DockerCompose]:
         yield compose
 
 
-@pytest.fixture(scope="session")
-def django_server(test_environment: DockerCompose) -> str:
-    return f"http://localhost:{test_environment.get_service_port('django', 8000)}"
+@pytest.fixture
+def admin_app(test_environment: DockerCompose, page: Page, govuk_signon_mock: GovUkSignonMock) -> AdminApp:
+    return AdminApp(page, f"http://localhost:{test_environment.get_service_port('django', 8000)}", govuk_signon_mock)
 
 
 @pytest.fixture(scope="session")
