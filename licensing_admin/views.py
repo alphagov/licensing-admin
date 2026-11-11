@@ -6,7 +6,7 @@ from authentication.decorators import public_view
 
 @public_view
 def login(request):
-    return render(request, "licensing_admin/login_page.html", {"title": "Login  - Licensing - GOV.UK"})
+    return render(request, "licensing_admin/login_page.html")
 
 
 def authorities_list(request):
@@ -14,5 +14,5 @@ def authorities_list(request):
     return render(
         request,
         "licensing_admin/authorities_list_page.html",
-        context={"title": "Authorities", "authorities": authorities},
+        context={"authorities": authorities},
     )
