@@ -30,5 +30,17 @@ def test_gds_admin_can_view_all_authorities(
 
 
 def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp, govuk_signon_mock: GovUkSignonMock):
+    # Given:
+    # - Not signed in
+
+    # When:
+    # Try to navigate to a page
     admin_app.navigate_to("authorities")
+
+    # Then:
+    # - Redirected to the login page
     assert admin_app.current_page_title() == "Login - Licensing - GOV.UK"
+
+
+def test_authorised_user_in_broken_state_is_redirect_to_error_page():
+    pass
