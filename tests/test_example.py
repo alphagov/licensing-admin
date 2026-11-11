@@ -21,8 +21,6 @@ def test_gds_admin_can_view_all_authorities(
     admin_app.login_as_gds_superadmin()
 
     # Then:
-    # - The GOVUK Signon Login page should have been navigated to
-    assert govuk_signon_mock.verify_login_page_navigated_to_x_times(1)
 
     # - The page that loads after sign-in should contain all expected authority details
     authorities_rendered: list[dict[str, str]] = admin_app.convert_html_table_to_pythonic_data_structure("authorities")

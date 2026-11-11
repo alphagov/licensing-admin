@@ -1,6 +1,5 @@
+from common.models.authority import Authority
 from django.shortcuts import render
-
-# from common.models.authority import Authority
 
 
 def login(request):
@@ -8,6 +7,5 @@ def login(request):
 
 
 def authorities_list(request):
-    # authorities = Authority.objects.all()
-    # print(authorities)
-    return render(request, "licensing_admin/authorities_list_page.html")
+    authorities = Authority.objects.all()
+    return render(request, "licensing_admin/authorities_list_page.html", context={"authorities": authorities})

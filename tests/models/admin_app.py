@@ -30,5 +30,5 @@ class AdminApp:
 
     def login_as_gds_superadmin(self):
         self.govuk_signon_mock.mock_gds_superuser_login()
-        self.browser.goto(f"{self.app_url}/login")
+        self.browser.goto(f"{self.app_url}/login?")
         self.browser.get_by_test_id("login").click()
