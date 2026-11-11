@@ -53,9 +53,9 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     # Replaces AuthenticationMiddleware: Populates request.user from cookie data
-    "licensing_admin.authentication.middleware.LicensifyAuthMiddleware"
+    "authentication.middleware.LicensifyAuthMiddleware",
     # Enforces GDS Admin / Authority isolation before view code runs
-    "licensing_admin.authentication.middleware.ViewPermissionEnforcementMiddleware",
+    # "authentication.middleware.ViewPermissionEnforcementMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
