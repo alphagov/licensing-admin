@@ -34,13 +34,11 @@ class ViewPermissionEnforcementMiddleware:
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         # Exempt public views (marked with @public_view) - notably the login page or the callback from login
-        login_url = "/login"
         if getattr(view_func, "_is_public", False):
             return None
 
         if not request.user.is_authenticated:
-            if request.path != login_url:
-                return redirect(f"{login_url}")
+            return redirect("/login")
 
         if "authority_slug" in view_kwargs:
             slug = view_kwargs["authority_slug"]
@@ -48,7 +46,7 @@ class ViewPermissionEnforcementMiddleware:
                 raise PermissionDenied(f"Access denied for authority '{slug}'.")
             return None
 
-        if not request.user.is_gds_admin and not login_url:
+        if not request.user.is_gds_admin:
             raise PermissionDenied("GDS Administrator access required.")
 
         return None
