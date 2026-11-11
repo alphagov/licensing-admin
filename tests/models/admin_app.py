@@ -32,3 +32,6 @@ class AdminApp:
         self.govuk_signon_mock.mock_gds_superuser_login()
         self.browser.goto(f"{self.app_url}/login?")
         self.browser.get_by_test_id("login").click()
+
+    def navigate_to(self, page: str):
+        self.browser.goto(f"{self.app_url}/{page}")

@@ -27,3 +27,8 @@ def test_gds_admin_can_view_all_authorities(
     authority_names_rendered: list[str] = extract_values_and_sort_result(authorities_rendered, "name")
     test_authority_names: list[str] = extract_values_and_sort_result(test_authorities, "full_name")
     assert authority_names_rendered == test_authority_names
+
+
+def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp, govuk_signon_mock: GovUkSignonMock):
+    admin_app.navigate_to("authorities")
+    assert admin_app.current_page_title() == "Login - Licensing - GOV.UK"

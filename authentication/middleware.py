@@ -1,3 +1,5 @@
+from django.shortcuts import redirect
+
 from authentication.models import AnonymousLicensifyUser, LicensifyUser
 
 
@@ -18,5 +20,8 @@ class LicensifyAuthMiddleware:
             )
         else:
             request.user = AnonymousLicensifyUser()
+            login_url = "/login"
+            if request.path != login_url:
+                return redirect(f"{login_url}")
 
         return self.get_response(request)
