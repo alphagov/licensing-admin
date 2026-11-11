@@ -35,7 +35,7 @@ def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
     # - Not signed in
 
     # When:
-    # Try to navigate to a page
+    # - Try to navigate to a page
     admin_app.navigate_to("authorities")
 
     # Then:
@@ -44,4 +44,12 @@ def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
 
 
 def test_authorised_user_in_broken_state_is_redirect_to_error_page():
+    # Given:
+    # - Signed in but permissions are "weird"
+
+    # When:
+    # - Try to navigate to a page
+
+    # Then:
+    # - Redirect to an error page
     pass
