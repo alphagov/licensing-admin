@@ -19,13 +19,14 @@ def test_gds_admin_can_view_all_authorities(
     # When:
     # - We login as a GDS superadmin user
     admin_app.login_as_gds_superadmin()
-
+    admin_app.navigate_to("authorities")
     # Then:
-
+    assert admin_app.current_page_title() == "Authorities"
     # - The page that loads after sign-in should contain all expected authority details
     authorities_rendered: list[dict[str, str]] = admin_app.convert_html_table_to_pythonic_data_structure("authorities")
     authority_names_rendered: list[str] = extract_values_and_sort_result(authorities_rendered, "name")
     test_authority_names: list[str] = extract_values_and_sort_result(test_authorities, "full_name")
+
     assert authority_names_rendered == test_authority_names
 
 

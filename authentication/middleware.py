@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 
 from authentication.models import AnonymousLicensifyUser, LicensifyUser
@@ -20,8 +21,34 @@ class LicensifyAuthMiddleware:
             )
         else:
             request.user = AnonymousLicensifyUser()
-            login_url = "/login"
+
+        return self.get_response(request)
+
+
+class ViewPermissionEnforcementMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        # Exempt public views (marked with @public_view) - notably the login page or the callback from login
+        login_url = "/login"
+        if getattr(view_func, "_is_public", False):
+            return None
+
+        if not request.user.is_authenticated:
             if request.path != login_url:
                 return redirect(f"{login_url}")
 
-        return self.get_response(request)
+        if "authority_slug" in view_kwargs:
+            slug = view_kwargs["authority_slug"]
+            if not request.user.can_access_authority(slug):
+                raise PermissionDenied(f"Access denied for authority '{slug}'.")
+            return None
+
+        if not request.user.is_gds_admin and not login_url:
+            raise PermissionDenied("GDS Administrator access required.")
+
+        return None

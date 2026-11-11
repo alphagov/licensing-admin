@@ -55,7 +55,7 @@ MIDDLEWARE = [
     # Replaces AuthenticationMiddleware: Populates request.user from cookie data
     "authentication.middleware.LicensifyAuthMiddleware",
     # Enforces GDS Admin / Authority isolation before view code runs
-    # "authentication.middleware.ViewPermissionEnforcementMiddleware",
+    "authentication.middleware.ViewPermissionEnforcementMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]

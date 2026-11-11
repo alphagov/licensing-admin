@@ -11,5 +11,5 @@ def authorities_list(request):
     return render(
         request,
         "licensing_admin/authorities_list_page.html",
-        context={"title": "authorities", "authorities": authorities},
+        context={"title": "Authorities", "authorities": authorities},
     )
