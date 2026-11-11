@@ -29,7 +29,7 @@ def test_gds_admin_can_view_all_authorities(
     assert authority_names_rendered == test_authority_names
 
 
-def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp, govuk_signon_mock: GovUkSignonMock):
+def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
     # Given:
     # - Not signed in
 
