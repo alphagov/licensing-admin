@@ -7,6 +7,8 @@ from models.local_authority import LocalAuthorityFactory
 from playwright.sync_api import Page
 from testcontainers.compose import DockerCompose
 
+pytest.register_assert_rewrite("custom_assertions")
+
 
 @pytest.fixture(autouse=True)
 def set_playwright_timeout(page: Page):

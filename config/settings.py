@@ -130,3 +130,6 @@ SESSION_COOKIE_AGE = 45 * 60  # TODO pull from env variable
 SESSION_COOKIE_NAME = "licensify_session"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"  # Needed because gov signon itself is external
+
+AUTHENTICATION_DOMAIN = os.getenv("AUTHENTICATION_DOMAIN", "")
+AUTHENTICATION_SIGN_IN_PATH = os.getenv("AUTHENTICATION_SIGN_IN_PATH", "")
