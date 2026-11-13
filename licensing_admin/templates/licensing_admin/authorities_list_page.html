@@ -1,0 +1,28 @@
+{% extends "licensing_admin/base.html" %}
+{% block title %}Authorities{% endblock %}
+{% block content %}
+    <p>AUTHORITIES</p>
+    <table data-testid="authorities">
+        <thead>
+        <tr>
+            <th>Authority Full Name</th>
+            <th>Agency ID</th>
+            <th>Payment Provider</th>
+            <th>Logo</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in authorities %}
+            <tr>
+                <td>{{ item.full_name }}</td>
+                <td>{{ item.agency_id }}</td>
+                <td>Payment provider is elsewhere for now</td>
+                <td>I'm not rendering a logo right now</td>
+                <td>Actions will live here</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock %}

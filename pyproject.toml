@@ -10,10 +10,14 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "beautifulsoup4>=4.15.0",
+    "faker>=40.44.0",
     "pre-commit>=4.6.0",
+    "pymongo>=4.19.0",
     "pytest-playwright>=0.10.0",
     "ruff>=0.15.22",
     "testcontainers>=4.15.0",
+    "testcontainers-mockserver>=9.2.0",
 ]
 
 [tool.ruff]
@@ -24,6 +28,7 @@ extend-exclude = [
     "__pycache__",
     "cache",
     "migrations",
+    "licensing_common"
 ]
 
 [tool.ruff.lint]
@@ -50,4 +55,4 @@ DJANGO_SETTINGS_MODULE = "config.settings"
 
 
 [tool.uv.sources]
-licensing_common = {path="./licensing_common", package= false}
+licensing_common = { path = "./licensing_common", package = false }

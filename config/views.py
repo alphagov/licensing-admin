@@ -1,6 +1,9 @@
 from django.http import HttpResponse
 
+from authentication.decorators import public_view
 
+
+@public_view
 def hello_world(request):
     return HttpResponse(
         """

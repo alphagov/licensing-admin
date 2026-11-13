@@ -1,0 +1,32 @@
+services:
+  django:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8000"
+    environment:
+      DOCUMENTDB_HOST: document_db
+      DOCUMENTDB_PORT: "10260"
+      DOCUMENTDB_USER: docdb
+      DOCUMENTDB_PASSWORD: password
+      DOCUMENTDB_ALLOW_INVALID_CERTS: "true"
+      DJANGO_ALLOWED_HOSTS: "*"
+      IS_PRODUCTION: "false"
+      GOVUK_SIGNON_URL: http://mockserver:1080
+    depends_on:
+      - mockserver
+      - document_db
+
+  mockserver:
+    image: mockserver/mockserver:latest
+    ports:
+      - "1080"
+
+  document_db:
+    image: ghcr.io/documentdb/documentdb/documentdb-local:latest
+    environment:
+      - USERNAME=docdb
+      - PASSWORD=password
+    ports:
+      - "10260"
