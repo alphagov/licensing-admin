@@ -13,13 +13,15 @@ def test_gds_admin_can_view_all_authorities(
 ) -> None:
     # Given:
     # - The database is populated with authorities
-    test_authorities = local_authority_factory.create_x(5)
+    test_authorities = local_authority_factory.create_x(500)
 
     # When:
     # - We login as a GDS superadmin user
     admin_app.login_as_gds_superadmin()
     admin_app.navigate_to_authorities()
-    # Then:
+    # Then
+    # - A call is made to sigon
+    # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID
     assert "authorit" in admin_app.current_page_title().lower()
     assert_table_matches(
         admin_app,
