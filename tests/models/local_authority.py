@@ -4,6 +4,8 @@ import random
 from faker import Faker
 from pymongo import MongoClient
 
+from models.payment_accounts import AuthorityPaymentAccountFactory
+
 fake = Faker("en_GB")
 
 
@@ -53,10 +55,11 @@ class LocalAuthority:
         self.agency_id = fake.random_int()
         self.authority_contact_details_holder = AuthorityContactDetailsHolder()
         self.countries = random.choice(["England", "Wales", "NI", "Scotland"])
-        self.full_name = fake.county()
+        self.full_name = fake.unique.county()
         self.image_base_64_encoded = base64.b64encode(fake.binary(length=32)).decode("utf-8")
         self.licence_details = Licence()
         self.snac_codes = fake.hexify(text="^^^^", upper=True)
+        self.url_slug = self.full_name.lower().replace(" ", "-")
 
     def to_json(self):
         return {
@@ -68,7 +71,7 @@ class LocalAuthority:
             "licenceDetails": [self.licence_details.to_json()],
             "name": self.full_name,
             "snacCodes": [self.snac_codes],
-            "urlSlug": self.full_name.lower(),
+            "urlSlug": self.url_slug,
         }
 
 
@@ -76,6 +79,7 @@ class LocalAuthorityFactory:
     def __init__(self, db_url: str):
         self._client = MongoClient(db_url)
         self._database = self._client.get_default_database()["authorities"]
+        self._authority_payment_account = AuthorityPaymentAccountFactory(db_url)
 
     def __enter__(self):
         return self
@@ -88,6 +92,9 @@ class LocalAuthorityFactory:
         for _ in range(x):
             local_authority = LocalAuthority()
             self._database.insert_one(local_authority.to_json())
+
+            payment_account = self._authority_payment_account.create(authority_url_slug=local_authority.url_slug)
+            local_authority.payment_provider = payment_account.payment_provider
             local_authorities_created.append(local_authority)
 
         return local_authorities_created

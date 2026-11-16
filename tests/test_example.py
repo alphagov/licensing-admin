@@ -1,4 +1,5 @@
 from custom_assertions import assert_table_matches
+from helpers.list_helpers import Column, extract_img_base64
 from models.admin_app import AdminApp
 from models.gov_uk_signon_mock import GovUkSignonMock
 from models.local_authority import LocalAuthorityFactory
@@ -13,7 +14,7 @@ def test_gds_admin_can_view_all_authorities(
 ) -> None:
     # Given:
     # - The database is populated with authorities
-    test_authorities = local_authority_factory.create_x(500)
+    test_authorities = local_authority_factory.create_x(10)
 
     # When:
     # - We login as a GDS superadmin user
@@ -21,17 +22,29 @@ def test_gds_admin_can_view_all_authorities(
     admin_app.navigate_to_authorities()
     # Then
     # - A call is made to sigon
-    # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID
+    # TODO
+    # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID, logo
     assert "authorit" in admin_app.current_page_title().lower()
+    columns = [
+        Column("Authority Full Name", "full_name"),
+        Column("Payment Provider", "payment_provider"),
+        Column("Agency ID", "agency_id"),
+        Column("Logo", "image_base_64_encoded", ui=extract_img_base64),
+    ]
     assert_table_matches(
-        admin_app,
+        admin_app=admin_app,
         table_test_id="authorities",
         expected_objects=test_authorities,
-        field_map={
-            "Authority Full Name": "full_name",
-            "Agency ID": "agency_id",
-        },
+        columns=columns,
     )
+
+
+# can edit an individual authority
+# can view licenses of individual authority
+# can view applications of individual authority (need to check if it's view only)
+# can view customisations for an individual authority
+# can view departments for an individual authority
+# can view payment accounts
 
 
 def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
@@ -48,13 +61,14 @@ def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
     assert "login" in admin_app.current_page_title().lower()
 
 
-def test_authorised_user_in_broken_state_is_redirect_to_error_page():
-    # Given:
-    # - Signed in but permissions are "weird"
-
-    # When:
-    # - Try to navigate to a page
-
-    # Then:
-    # - Redirect to an error page
-    pass
+#
+# def test_authorised_user_in_broken_state_is_redirect_to_error_page():
+#     # Given:
+#     # - Signed in but permissions are "weird"
+#
+#     # When:
+#     # - Try to navigate to a page
+#
+#     # Then:
+#     # - Redirect to an error page
+#     pass

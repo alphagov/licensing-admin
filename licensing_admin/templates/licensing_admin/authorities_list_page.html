@@ -13,12 +13,15 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in authorities %}
+        {% for authority in authorities %}
             <tr>
-                <td>{{ item.full_name }}</td>
-                <td>{{ item.agency_id }}</td>
-                <td>Payment provider is elsewhere for now</td>
-                <td>I'm not rendering a logo right now</td>
+                <td>{{ authority.full_name }}</td>
+                <td>{{ authority.agency_id }}</td>
+                <td>{{ authority.payment_account.payment_provider }}</td>
+                <td><img
+                        src="data:image/png;base64,{{ authority.encoded_image }}"
+                        alt="{{ authority.full_name }} logo"
+                ></td>
                 <td>Actions will live here</td>
             </tr>
         {% endfor %}

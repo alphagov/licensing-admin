@@ -1,19 +1,56 @@
+import re
+from collections.abc import Callable
+from dataclasses import dataclass
 from operator import attrgetter
+from typing import Any
 
 
-def map_objects_to_dicts(objects: list, field_map: dict[str, str]) -> list[dict[str, str]]:
-    """Converts a list of Python objects into dicts keyed by the given mapping."""
-    getters = {header: attrgetter(attr_path) for header, attr_path in field_map.items()}
-    return [{header: str(getter(item)) for header, getter in getters.items()} for item in objects]
+@dataclass
+class Column:
+    header: str
+    db_attr: str
+    ui: Callable[[str], str] | None = None
+    db: Callable[[Any], str] | None = None
 
 
-def filter_and_sort_dicts(rows: list[dict[str, str]], keys: list[str], sort_by: str = "") -> list[dict[str, str]]:
-    """Keeps only the specified keys (ignoring extra UI columns) and sorts the rows."""
-    if not rows or not keys:
-        return []
+def normalize_ui_rows(
+    ui_rows: list[dict[str, str]],
+    columns: list[Column],
+) -> list[dict[str, str]]:
+    """Keeps mapped columns (dropping extra UI-only columns) and applies UI transforms."""
+    results = []
+    for row in ui_rows:
+        clean_row = {}
+        for col in columns:
+            raw_value = row[col.header]
+            clean_row[col.header] = col.ui(raw_value) if col.ui else raw_value
+        results.append(clean_row)
+    return results
 
-    if not sort_by:
-        sort_by = keys[0]
 
-    filtered = [{key: row[key] for key in keys} for row in rows]
-    return sorted(filtered, key=lambda row: row[sort_by])
+def extract_db_rows(
+    objects: list[Any],
+    columns: list[Column],
+) -> list[dict[str, str]]:
+    """Extracts attributes from DB objects and formats them into strings."""
+    results = []
+    for item in objects:
+        clean_row = {}
+        for col in columns:
+            raw_value = attrgetter(col.db_attr)(item)
+            if col.db:
+                clean_row[col.header] = col.db(raw_value)
+            elif raw_value is None:
+                clean_row[col.header] = ""
+            else:
+                clean_row[col.header] = str(raw_value)
+        results.append(clean_row)
+    return results
+
+
+def extract_img_base64(html: str) -> str:
+    """Extracts the base64 payload from an <img src='data:...;base64,...'> tag."""
+    if not html:
+        return ""
+    match = re.search(r"base64,([^\"']+)", html)
+    return match.group(1) if match else html

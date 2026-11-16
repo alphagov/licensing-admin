@@ -23,7 +23,11 @@ class AdminApp:
         headers = [th.get_text(strip=True) for th in table.select("thead th")]
         results = []
         for row in table.select("tbody tr"):
-            cells = [td.get_text(strip=True) for td in row.select("td")]
+            cells = [
+                td.get_text(strip=True) or td.decode_contents().strip()
+                # second half largely so we can test logo images
+                for td in row.select("td")
+            ]
             results.append(dict(zip(headers, cells, strict=True)))
 
         return results
