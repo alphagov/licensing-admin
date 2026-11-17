@@ -19,10 +19,9 @@ def test_gds_admin_can_view_all_authorities(
     # When:
     # - We login as a GDS superadmin user
     admin_app.login_as_gds_superadmin()
-    admin_app.navigate_to_authorities()
     # Then
     # - A call is made to sigon
-    # TODO
+    assert govuk_signon_mock.verify_signon_login_called_x_times(1)
     # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID, logo
     assert "authorit" in admin_app.current_page_title().lower()
     columns = [
@@ -54,7 +53,7 @@ def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
     # When:
     # - Try to navigate to a page
 
-    admin_app.navigate_to_licences()
+    admin_app.navigate_to_authorities()
 
     # Then:
     # - Redirected to the login page

@@ -1,7 +1,7 @@
 import json
 
 from faker import Faker
-from mockserver import HttpRequest, HttpResponse, MockServerClient
+from mockserver import HttpRequest, HttpResponse, HttpTemplate, MockServerClient
 
 fake = Faker("en_GB")
 
@@ -9,10 +9,55 @@ fake = Faker("en_GB")
 class GovUkSignonMock:
     def __init__(self, host: str, port: int):
         self.client = MockServerClient(host, port)
-        self.login_request = HttpRequest.request("/signon/login").with_method("GET")
+        self.authorize_request = HttpRequest.request("/oauth/authorize").with_method("GET")
+        self.token_request = HttpRequest.request("/oauth/token").with_method("POST")
+        self.user_details_request = HttpRequest.request("/user.json").with_method("GET")
+
+    def reset(self):
+        self.client.reset()
 
     def mock_gds_superuser_login(self):
-        self.client.when(self.login_request).respond(
+        self._mock_user_login(permissions={"Licensify": ["signin", "gdsadministrator"]})
+
+    def _mock_user_login(self, permissions: dict[str, list[str]] | list[str]):
+        self.reset()
+
+        # 1. Browser hits /oauth/authorize -> 302 redirect back to Django's redirect_uri
+        #    echoing the exact CSRF `state` query param plus a dummy auth `code`.
+        velocity_template = json.dumps(
+            {
+                "statusCode": 302,
+                "headers": {
+                    "Location": [
+                        "$!request.queryStringParameters.get('redirect_uri').get(0)"
+                        "?code=test-auth-code"
+                        "&state=$!request.queryStringParameters.get('state').get(0)"
+                    ]
+                },
+            }
+        )
+        self.client.when(self.authorize_request).respond(
+            HttpTemplate(
+                template=velocity_template,
+                template_type="VELOCITY",
+            )
+        )
+
+        # 2. Django exchanges the code for an access token
+        self.client.when(self.token_request).respond(
+            HttpResponse.response(
+                status_code=200,
+                body=json.dumps(
+                    {
+                        "access_token": "test-access-token",
+                        "token_type": "bearer",
+                    }
+                ),
+            ).with_header("Content-Type", "application/json")
+        )
+
+        # 3. Django fetches the user's Signon profile & permissions
+        self.client.when(self.user_details_request).respond(
             HttpResponse.response(
                 status_code=200,
                 body=json.dumps(
@@ -21,14 +66,13 @@ class GovUkSignonMock:
                             "uid": str(fake.uuid4()),
                             "name": fake.name(),
                             "email": fake.email(),
-                            "permissions": {"Licensify": ["signin"]},
+                            "permissions": permissions,
                         }
                     }
                 ),
-            )
+            ).with_header("Content-Type", "application/json")
         )
 
-    def verify_login_page_navigated_to_x_times(self, x: int) -> bool:
-        requests = self.client.retrieve_recorded_requests(self.login_request)
-
+    def verify_signon_login_called_x_times(self, x: int) -> bool:
+        requests = self.client.retrieve_recorded_requests(self.authorize_request)
         return len(requests) == x

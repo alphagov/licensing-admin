@@ -24,6 +24,7 @@ from .views import hello_world
 
 urlpatterns = [
     path("", include("licensing_admin.urls")),
+    path("", include("authentication.urls")),
     path("", hello_world, name="hello_world"),
     path("assets/<path:path>", RedirectView.as_view(url="/static/assets/%(path)s", permanent=False)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

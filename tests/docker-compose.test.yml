@@ -13,15 +13,22 @@ services:
       DOCUMENTDB_ALLOW_INVALID_CERTS: "true"
       DJANGO_ALLOWED_HOSTS: "*"
       IS_PRODUCTION: "false"
-      GOVUK_SIGNON_URL: http://mockserver:1080
+      OAUTH_CALLBACK_URL_OVERRIDE: ""
+      SIGNON_URL: http://localhost:11080
+      SIGNON_AUTHORIZATION_URL: http://localhost:11080/oauth/authorize
+      SIGNON_INTERNAL_URL: http://mockserver:1080
+      SIGNON_CLIENT_ID: test-client-id
+      SIGNON_CLIENT_SECRET: test-client-secret
     depends_on:
       - mockserver
       - document_db
 
   mockserver:
     image: mockserver/mockserver:latest
+    environment:
+      MOCKSERVER_ENABLE_VELOCITY: "true"
     ports:
-      - "1080"
+      - "11080:1080"
 
   document_db:
     image: ghcr.io/documentdb/documentdb/documentdb-local:latest

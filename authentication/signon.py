@@ -1,8 +1,9 @@
+import json
 import logging
 import secrets
 from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
-import requests
 from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def _get_callback_url(request) -> str:
-    return settings.OAUTH_CALLBACK_URL_OVERRIDE or request.build_absolute_uri(request.path)
+    return settings.OAUTH_CALLBACK_URL_OVERRIDE or request.build_absolute_uri(reverse("oauth_callback"))
 
 
 def start_signon_redirect(request):
@@ -51,27 +52,38 @@ def handle_signon_callback(request):
 
 def _fetch_signon_user(code: str, callback_url: str) -> dict:
     """Exchanges an authorization code for an access token and fetches the Signon profile."""
-    token_response = requests.post(
-        settings.SIGNON_ACCESS_TOKEN_URL,
-        data={
+    token_payload = urlencode(
+        {
             "client_id": settings.SIGNON_CLIENT_ID,
             "client_secret": settings.SIGNON_CLIENT_SECRET,
             "grant_type": "authorization_code",
             "code": code,
             "redirect_uri": callback_url,
-        },
-        timeout=10,
-    )
-    token_response.raise_for_status()
-    user_profile_access_token = token_response.json()["access_token"]
+        }
+    ).encode("utf-8")
 
-    user_response = requests.get(
-        settings.SIGNON_USER_DETAILS_URL,
-        params={"access_token": user_profile_access_token},
-        timeout=10,
+    token_request = Request(
+        settings.SIGNON_ACCESS_TOKEN_URL,
+        data=token_payload,
+        headers={"Accept": "application/json"},
+        method="POST",
     )
-    user_response.raise_for_status()
-    user = user_response.json()["user"]
+    with urlopen(token_request, timeout=10) as token_response:
+        token_data = json.loads(token_response.read().decode("utf-8"))
+
+    user_profile_access_token = token_data["access_token"]
+
+    user_details_query = urlencode({"access_token": user_profile_access_token})
+    separator = "&" if "?" in settings.SIGNON_USER_DETAILS_URL else "?"
+    user_request = Request(
+        f"{settings.SIGNON_USER_DETAILS_URL}{separator}{user_details_query}",
+        headers={"Accept": "application/json"},
+        method="GET",
+    )
+    with urlopen(user_request, timeout=10) as user_response:
+        user_data = json.loads(user_response.read().decode("utf-8"))
+
+    user = user_data["user"]
 
     # Signon returns permissions as either a flat list or a dict keyed by app name
     raw_perms = user.get("permissions", [])
@@ -114,4 +126,4 @@ def _complete_login(request, user_data: dict):
     if "gdsadministrator" not in permissions:
         return redirect("authority_detail", authority_slug=authorities[0])
 
-    return redirect("authorities")
+    return redirect("authorities_list")
