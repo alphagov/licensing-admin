@@ -23,10 +23,7 @@ sys.path.insert(0, str(BASE_DIR / "licensing_common"))
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-)_*-zeg)shi6!y!lufkmy_g8&6%s!0pk=d1erm)rgbchgqfa($",
-)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("IS_PRODUCTION", "true").lower() not in ["true", "1", "t", "yes"]
