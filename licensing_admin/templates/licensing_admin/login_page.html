@@ -1,5 +1,7 @@
 {% extends "licensing_admin/base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-    <button data-testid="login"> LOGIN</button>
+    <a href="{% url 'signon_login' %}" role="button" class="govuk-button" data-testid="login">
+        Login
+    </a>
 {% endblock %}

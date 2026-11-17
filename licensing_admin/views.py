@@ -12,7 +12,6 @@ def login(request):
     return render(request, "licensing_admin/login_page.html")
 
 
-@public_view  # TODO remove
 def authorities_list(request):
     authorities = list(Authority.objects.select_related("payment_account"))
 

@@ -6,4 +6,5 @@ urlpatterns = [
     path("login", login, name="login"),
     path("authorities", authorities_list, name="authorities_list"),
     path("licences", licences_list, name="licences_list"),
+    # path("licence-management/admin/oauth", views.oauth, name="oauth")
 ]

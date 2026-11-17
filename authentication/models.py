@@ -1,5 +1,13 @@
 from dataclasses import dataclass
 
+SPECIAL_PERMISSIONS = frozenset(
+    {
+        "signin",
+        "gdsadministrator",
+        "authorityadministrator",
+    }
+)
+
 
 @dataclass(frozen=True)
 class LicensifyUser:
@@ -10,26 +18,30 @@ class LicensifyUser:
 
     @property
     def is_authenticated(self) -> bool:
-        return True
+        return "signin" in self.permissions
 
     @property
     def is_gds_admin(self) -> bool:
         return "gdsadministrator" in self.permissions
 
     @property
+    def is_authority_admin(self) -> bool:
+        return "authorityadministrator" in self.permissions
+
+    @property
     def authorities(self) -> frozenset[str]:
-        system_roles = {"signin", "gdsadministrator"}
-        return frozenset(self.permissions) - system_roles
+        return frozenset(self.permissions) - SPECIAL_PERMISSIONS
 
     def can_access_authority(self, authority_slug: str) -> bool:
-        return self.is_gds_admin or authority_slug in self.authorities
+        return self.is_gds_admin or authority_slug.lower() in self.authorities
 
 
 @dataclass(frozen=True)
 class AnonymousLicensifyUser:
     is_authenticated: bool = False
     is_gds_admin: bool = False
-    authorities: frozenset = frozenset()
+    is_authority_admin: bool = False
+    authorities: frozenset[str] = frozenset()
 
     def can_access_authority(self, authority_slug: str) -> bool:
         return False

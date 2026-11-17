@@ -36,7 +36,6 @@ ALLOWED_HOSTS = os.environ.get(
     "localhost,127.0.0.1,[::1]",
 ).split(",")
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -79,7 +78,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
@@ -103,7 +101,6 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django_mongodb_backend.fields.ObjectIdAutoField"
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
@@ -114,7 +111,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
@@ -131,5 +127,10 @@ SESSION_COOKIE_NAME = "licensify_session"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"  # Needed because gov signon itself is external
 
-AUTHENTICATION_DOMAIN = os.getenv("AUTHENTICATION_DOMAIN", "")
-AUTHENTICATION_SIGN_IN_PATH = os.getenv("AUTHENTICATION_SIGN_IN_PATH", "")
+SIGNON_URL = os.environ["SIGNON_URL"]
+SIGNON_CLIENT_ID = os.environ["SIGNON_CLIENT_ID"]
+SIGNON_CLIENT_SECRET = os.environ["SIGNON_CLIENT_SECRET"]
+SIGNON_AUTHORIZATION_URL = os.environ["SIGNON_AUTHORIZATION_URL"]
+SIGNON_ACCESS_TOKEN_URL = os.environ["SIGNON_ACCESS_TOKEN_URL"]
+SIGNON_USER_DETAILS_URL = os.environ["SIGNON_USER_DETAILS_URL"]
+OAUTH_CALLBACK_URL_OVERRIDE = os.environ.get("OAUTH_CALLBACK_URL_OVERRIDE", "")
