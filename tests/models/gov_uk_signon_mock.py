@@ -24,15 +24,17 @@ class GovUkSignonMock:
 
         # 1. Browser hits /oauth/authorize -> 302 redirect back to Django's redirect_uri
         #    echoing the exact CSRF `state` query param plus a dummy auth `code`.
+        redirect_location = (
+            "$!request.queryStringParameters.get('redirect_uri').get(0)"
+            "?code=test-auth-code"
+            "&state=$!request.queryStringParameters.get('state').get(0)"
+        )
+
         velocity_template = json.dumps(
             {
                 "statusCode": 302,
                 "headers": {
-                    "Location": [
-                        "$!request.queryStringParameters.get('redirect_uri').get(0)"
-                        "?code=test-auth-code"
-                        "&state=$!request.queryStringParameters.get('state').get(0)"
-                    ]
+                    "Location": [redirect_location],
                 },
             }
         )
