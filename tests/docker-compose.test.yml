@@ -19,6 +19,7 @@ services:
       SIGNON_INTERNAL_URL: http://mockserver:1080
       SIGNON_CLIENT_ID: test-client-id
       SIGNON_CLIENT_SECRET: test-client-secret
+      DJANGO_SECRET_KEY: ttr495tyh65t^Y^%$R%Edw
     depends_on:
       - mockserver
       - document_db
