@@ -1,5 +1,6 @@
 from collections.abc import Generator, Iterator
 
+import docker
 import pytest
 from models.admin_app import AdminApp
 from models.gov_uk_signon_mock import GovUkSignonMock
@@ -38,3 +39,18 @@ def local_authority_factory(test_environment: DockerCompose) -> Generator[LocalA
     db_url = f"mongodb://docdb:password@localhost:{host_port}/licensify?authSource=admin"
     with LocalAuthorityFactory(db_url) as factory:
         yield factory
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+
+    if report.when == "call" and report.failed:
+        client = docker.from_env()
+
+        containers = client.containers.list(filters={"label": "com.docker.compose.project"})
+
+        for container in containers:
+            print(f"\n--- Logs: {container.name} ---")  # noqa: T201
+            print(container.logs().decode("utf-8"))  # noqa: T201
