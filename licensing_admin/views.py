@@ -20,11 +20,3 @@ def authorities_list(request):
         "licensing_admin/authorities_list_page.html",
         context={"authorities": authorities},
     )
-
-
-def licences_list(request):
-    # placeholder
-    return render(
-        request,
-        "licensing_admin/authorities_list_page.html",
-    )

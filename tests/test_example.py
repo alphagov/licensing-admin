@@ -40,36 +40,15 @@ def test_gds_admin_can_view_all_authorities(
     )
 
 
-# can edit an individual authority
-# can view licenses of individual authority
-# can view applications of individual authority (need to check if it's view only)
-# can view customisations for an individual authority
-# can view departments for an individual authority
-# can view payment accounts
-
-
 def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
     # Given:
     # - Not signed in
 
     # When:
-    # - Try to navigate to a page
+    # - Try to navigate to authorities page
 
     admin_app.navigate_to_authorities()
 
     # Then:
     # - Redirected to the login page
     assert "login" in admin_app.current_page_title().lower()
-
-
-#
-# def test_authorised_user_in_broken_state_is_redirect_to_error_page():
-#     # Given:
-#     # - Signed in but permissions are "weird"
-#
-#     # When:
-#     # - Try to navigate to a page
-#
-#     # Then:
-#     # - Redirect to an error page
-#     pass

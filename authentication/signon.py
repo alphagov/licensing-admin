@@ -123,7 +123,4 @@ def _complete_login(request, user_data: dict):
         "permissions": permissions,
     }
 
-    # if "gdsadministrator" not in permissions:
-    #     return redirect("applications", authority_slug=authorities[0])
-
     return redirect("authorities_list")
