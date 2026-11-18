@@ -14,9 +14,8 @@ services:
       DJANGO_ALLOWED_HOSTS: "*"
       IS_PRODUCTION: "false"
       OAUTH_CALLBACK_URL_OVERRIDE: ""
-      SIGNON_URL: http://localhost:11080
-      SIGNON_AUTHORIZATION_URL: http://localhost:11080/oauth/authorize
-      SIGNON_INTERNAL_URL: http://mockserver:1080
+      PYTHONUNBUFFERED: "1"
+      SIGNON_URL: http://mockserver:1080
       SIGNON_CLIENT_ID: test-client-id
       SIGNON_CLIENT_SECRET: test-client-secret
       DJANGO_SECRET_KEY: ttr495tyh65t^Y^%$R%Edw
@@ -28,8 +27,9 @@ services:
     image: mockserver/mockserver:latest
     environment:
       MOCKSERVER_ENABLE_VELOCITY: "true"
+      MOCKSERVER_LOG_LEVEL: INFO
     ports:
-      - "11080:1080"
+      - "1080"
 
   document_db:
     image: ghcr.io/documentdb/documentdb/documentdb-local:latest
