@@ -6,7 +6,7 @@ python = "3.14"
 python.uv_venv_auto = "source"
 
 [env]
-IS_PRODUCTION = "False"
+IS_PRODUCTION = "True"
 DJANGO_SECRET_KEY = "django-insecure-)_*-zeg)shi6!y!lufkmy_g8&6%s!0pk=d1erm)rgbchgqfa($"
 CITIZEN_FRONTEND_PORT = "8000"
 DOCUMENTDB_USER = "docdb"

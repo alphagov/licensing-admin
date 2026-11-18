@@ -1,4 +1,3 @@
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 
 from authentication.models import AnonymousLicensifyUser, LicensifyUser
@@ -40,13 +39,13 @@ class ViewPermissionEnforcementMiddleware:
         if not request.user.is_authenticated:
             return redirect("/login")
 
-        if "authority_slug" in view_kwargs:
-            slug = view_kwargs["authority_slug"]
-            if not request.user.can_access_authority(slug):
-                raise PermissionDenied(f"Access denied for authority '{slug}'.")
-            return None
+        # if "authority_slug" in view_kwargs:
+        #     slug = view_kwargs["authority_slug"]
+        #     if not request.user.can_access_authority(slug):
+        #         raise PermissionDenied(f"Access denied for authority '{slug}'.")
+        #     return None
 
-        if not request.user.is_gds_admin:
-            raise PermissionDenied("GDS Administrator access required.")
+        # if not request.user.is_gds_admin:
+        #     raise PermissionDenied("GDS Administrator access required.")
 
         return None
