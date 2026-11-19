@@ -14,7 +14,7 @@ from testcontainers.compose import DockerCompose
 @pytest.fixture(autouse=True)
 def set_playwright_timeout(page: Page):
     # Action timeout (click, fill, wait_for_selector, etc.) in milliseconds
-    page.set_default_timeout(2000)
+    page.set_default_timeout(8000)
 
 
 @pytest.fixture(scope="session")

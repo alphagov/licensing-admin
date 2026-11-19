@@ -17,10 +17,19 @@ class GovUkSignonMock:
         self.client.reset()
 
     def mock_gds_superuser_login(self):
-        self._mock_user_login(permissions={"Licensify": ["signin", "gdsadministrator"]})
+        return self._mock_user_login(permissions={"Licensify": ["signin", "gdsadministrator"]})
 
     def _mock_user_login(self, permissions: dict[str, list[str]] | list[str]):
         self.reset()
+
+        user = {
+            "user": {
+                "uid": str(fake.uuid4()),
+                "name": fake.name(),
+                "email": fake.email(),
+                "permissions": permissions,
+            }
+        }
 
         # 1. Browser hits /oauth/authorize -> 302 redirect back to Django's redirect_uri
         #    echoing the exact CSRF `state` query param plus a dummy auth `code`.
@@ -62,19 +71,14 @@ class GovUkSignonMock:
         self.client.when(self.user_details_request).respond(
             HttpResponse.response(
                 status_code=200,
-                body=json.dumps(
-                    {
-                        "user": {
-                            "uid": str(fake.uuid4()),
-                            "name": fake.name(),
-                            "email": fake.email(),
-                            "permissions": permissions,
-                        }
-                    }
-                ),
+                body=json.dumps(user),
             ).with_header("Content-Type", "application/json")
         )
 
-    def verify_signon_login_called_x_times(self, x: int) -> bool:
-        requests = self.client.retrieve_recorded_requests(self.authorize_request)
-        return len(requests) == x
+        return user
+
+    def verify_signon_login_occurred_correctly(self) -> bool:
+        auth_code_requests = self.client.retrieve_recorded_requests(self.authorize_request)
+        access_token_requests = self.client.retrieve_recorded_requests(self.token_request)
+        signon_user_data_requests = self.client.retrieve_recorded_requests(self.user_details_request)
+        return len(auth_code_requests) == 1 and len(access_token_requests) == 1 and len(signon_user_data_requests) == 1
