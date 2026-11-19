@@ -1,4 +1,3 @@
-from custom_assertions import assert_table_matches
 from helpers.list_helpers import Column, extract_img_base64
 from models.admin_app import AdminApp
 from models.gov_uk_signon_mock import GovUkSignonMock
@@ -22,21 +21,18 @@ def test_gds_admin_can_view_all_authorities(
 
     # Then
     # - A call is made to sigon
-    # assert govuk_signon_mock.verify_signon_login_called_x_times(1)
+    assert govuk_signon_mock.verify_signon_login_called_x_times(1)
 
     # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID, logo
-    # assert "authorit" in admin_app.current_page_title().lower()
+    assert "authorit" in admin_app.current_page_title().lower()
     columns = [
         Column("Authority Full Name", "full_name"),
         Column("Payment Provider", "payment_provider"),
         Column("Agency ID", "agency_id"),
         Column("Logo", "image_base_64_encoded", ui=extract_img_base64),
     ]
-    assert_table_matches(
-        admin_app=admin_app,
-        table_test_id="authorities",
-        expected_objects=test_authorities,
-        columns=columns,
+    admin_app.verify_admin_data_table_matches_expected_data(
+        table_test_id="authorities", expected_objects=test_authorities, columns=columns
     )
 
 

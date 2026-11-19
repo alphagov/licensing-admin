@@ -56,3 +56,6 @@ DJANGO_SETTINGS_MODULE = "config.settings"
 
 [tool.uv.sources]
 licensing_common = { path = "./licensing_common", package = false }
+
+[tool.ruff.lint.per-file-ignores]
+"tests/conftest.py" = ["E402"]

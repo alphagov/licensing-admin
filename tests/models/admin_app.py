@@ -1,4 +1,7 @@
+from operator import itemgetter
+
 from bs4 import BeautifulSoup
+from helpers.list_helpers import Column, extract_db_rows, normalize_ui_rows
 from playwright.sync_api import Page
 
 from models.gov_uk_signon_mock import GovUkSignonMock
@@ -11,10 +14,33 @@ class AdminApp:
         self.govuk_signon_mock = govuk_signon_mock
         self.browser.goto(app_url)
 
+    def verify_admin_data_table_matches_expected_data(
+        self,
+        table_test_id: str,
+        expected_objects: list,
+        columns: list[Column],
+        sort_by: str = "",
+    ) -> None:
+        __tracebackhide__ = True
+
+        if not columns:
+            raise ValueError("columns cannot be empty")
+
+        sort_key = sort_by or columns[0].header
+
+        raw_ui_rows = self._convert_html_table_to_pythonic_data_structure(table_test_id)
+        normalized_ui_rows = normalize_ui_rows(raw_ui_rows, columns)
+        actual = sorted(normalized_ui_rows, key=itemgetter(sort_key))
+
+        extracted_db_rows = extract_db_rows(expected_objects, columns)
+        expected = sorted(extracted_db_rows, key=itemgetter(sort_key))
+
+        assert actual == expected
+
     def current_page_title(self) -> str:
         return self.browser.title()
 
-    def convert_html_table_to_pythonic_data_structure(self, table_test_id: str) -> list[dict[str, str]]:
+    def _convert_html_table_to_pythonic_data_structure(self, table_test_id: str) -> list[dict[str, str]]:
         """The table is returned so that each row is a list item,
         each column is a key in the dict, and the cell value is a
         value in the dict"""
@@ -36,6 +62,7 @@ class AdminApp:
         self.govuk_signon_mock.mock_gds_superuser_login()
         self.browser.goto(f"{self.app_url}/login")
         self.browser.get_by_test_id("login").click()
+        self.browser.wait_for_url(f"{self.app_url}/authorities")
 
     def _navigate_to(self, page: str):
         self.browser.goto(f"{self.app_url}/{page}")
