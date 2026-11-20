@@ -1,0 +1,41 @@
+from django.shortcuts import redirect
+
+from authentication.licensify_user import AnonymousLicensifyUser, LicensifyUser
+
+
+class LicensifyAuthMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        user_dict = request.session.get("signon_user")
+
+        if user_dict:
+            request.user = LicensifyUser(
+                uid=user_dict["uid"],
+                email=user_dict["email"],
+                display_name=user_dict["display_name"],
+                permissions=tuple(user_dict.get("permissions", [])),
+            )
+        else:
+            request.user = AnonymousLicensifyUser()
+
+        return self.get_response(request)
+
+
+class ViewPermissionEnforcementMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        # Exempt public views (marked with @public_view) - notably the login page or the callback from login
+        if getattr(view_func, "_is_public", False):
+            return None
+
+        if not request.user.is_authenticated:
+            return redirect("/login")
+
+        return None

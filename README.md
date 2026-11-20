@@ -3,6 +3,27 @@ Licensing admin application to manage licence applications
 
 ## Set up
 
+### Environment Variables
+
+- ADMIN_APP_AUTH_CODE_RESPONSE_URL
+    - Specifies the URL that should be redirected to by GOV.UK Signon when an auth code request is submitted
+- DJANGO_SECRET_KEY
+- DOCUMENTDB_ALLOW_INVALID_CERTS = "true"
+- DOCUMENTDB_IMAGE
+    - Used by the `licensing_common` Git submodule to provide a DocumentDB service when running the system 
+    on a local machine
+- DOCUMENTDB_PASSWORD
+- DOCUMENTDB_PORT
+- DOCUMENTDB_USER
+- IS_PRODUCTION 
+- SESSION_COOKIE_AGE
+    - Specified in seconds
+- SIGNON_CLIENT_ID
+- SIGNON_CLIENT_SECRET = "dev-client-secret"
+- SIGNON_AUTH_CODE_REQUEST_URL = ""
+- SIGNON_ACCESS_TOKEN_REQUEST_URL = ""
+- SIGNON_USER_DETAILS_URL = ""
+
 ## Mise
 
 This repository uses [mise](https://mise.jdx.dev/) to manage tool versions and environment variables.
