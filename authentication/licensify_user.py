@@ -24,24 +24,8 @@ class LicensifyUser:
     def is_gds_admin(self) -> bool:
         return "gdsadministrator" in self.permissions
 
-    @property
-    def is_authority_admin(self) -> bool:
-        return "authorityadministrator" in self.permissions
-
-    @property
-    def authorities(self) -> frozenset[str]:
-        return frozenset(self.permissions) - SPECIAL_PERMISSIONS
-
-    def can_access_authority(self, authority_slug: str) -> bool:
-        return self.is_gds_admin or authority_slug.lower() in self.authorities
-
 
 @dataclass(frozen=True)
 class AnonymousLicensifyUser:
     is_authenticated: bool = False
     is_gds_admin: bool = False
-    is_authority_admin: bool = False
-    authorities: frozenset[str] = frozenset()
-
-    def can_access_authority(self, authority_slug: str) -> bool:
-        return False

@@ -119,7 +119,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Auth cookie
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_COOKIE_AGE = os.environ.get("SESSION_COOKIE_AGE", str(45 * 60))
+SESSION_COOKIE_AGE = int(os.environ.get("SESSION_COOKIE_AGE", str(45 * 60)))
 SESSION_COOKIE_NAME = "licensify_session"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"  # Needed because gov signon itself is external

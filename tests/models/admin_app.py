@@ -54,16 +54,16 @@ class AdminApp:
         self._navigate_to("licences")
 
     def verify_login_occurred_correctly(self, user):
-        return (
-            self.govuk_signon_mock.verify_signon_login_occurred_correctly()
-            and self._verify_signon_user_session_cookie_set_correctly(user)
-        )
+        __tracebackhide__ = True
+        self.govuk_signon_mock.verify_signon_login_occurred_correctly()
+        self._verify_signon_user_session_cookie_set_correctly(user)
 
     ###########################
     ##### PRIVATE METHODS #####
     ###########################
 
     def _verify_signon_user_session_cookie_set_correctly(self, expected_user):
+        __tracebackhide__ = True
         cookies = self.browser.context.cookies()
         session_cookie = next(
             (c for c in cookies if c["name"] == "licensify_session"),
@@ -71,7 +71,6 @@ class AdminApp:
         )
         assert session_cookie is not None, "licensify_session cookie not found"
 
-        # Optional: verify your cookie security flags
         assert session_cookie["httpOnly"] is True
         assert session_cookie["sameSite"] == "Lax"
 
@@ -85,7 +84,7 @@ class AdminApp:
             fallback_keys=[],
         )
 
-        return session_data["signon_user"] == {
+        assert session_data["signon_user"] == {
             "uid": expected_user["user"]["uid"],
             "email": expected_user["user"]["email"],
             "display_name": expected_user["user"]["name"],

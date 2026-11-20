@@ -77,8 +77,10 @@ class GovUkSignonMock:
 
         return user
 
-    def verify_signon_login_occurred_correctly(self) -> bool:
+    def verify_signon_login_occurred_correctly(self):
         auth_code_requests = self.client.retrieve_recorded_requests(self.authorize_request)
         access_token_requests = self.client.retrieve_recorded_requests(self.token_request)
         signon_user_data_requests = self.client.retrieve_recorded_requests(self.user_details_request)
-        return len(auth_code_requests) == 1 and len(access_token_requests) == 1 and len(signon_user_data_requests) == 1
+        assert len(auth_code_requests) == 1
+        assert len(access_token_requests) == 1
+        assert len(signon_user_data_requests) == 1

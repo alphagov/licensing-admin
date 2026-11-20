@@ -41,6 +41,7 @@ def local_authority_factory(test_environment: DockerCompose) -> Generator[LocalA
         yield factory
 
 
+# django test logs only (no postgres/startup spam, debugging a normal test)
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     outcome = yield
@@ -48,9 +49,28 @@ def pytest_runtest_makereport(item, call):
 
     if report.when == "call" and report.failed:
         client = docker.from_env()
-
-        containers = client.containers.list(filters={"label": "com.docker.compose.project"})
-
+        containers = client.containers.list(
+            filters={"label": ["com.docker.compose.project", "com.docker.compose.service=django"]}
+        )
         for container in containers:
+            raw_logs = container.logs(since=int(call.start)).decode("utf-8")
+            clean_logs = "\n".join(line for line in raw_logs.splitlines() if "cron job" not in line)
             print(f"\n--- Logs: {container.name} ---")  # noqa: T201
-            print(container.logs().decode("utf-8"))  # noqa: T201
+            print(clean_logs)  # noqa: T201
+
+
+#
+# # full stack history (probably debugging the test setup)
+# @pytest.hookimpl(hookwrapper=True)
+# def pytest_runtest_makereport(item, call):
+#     outcome = yield
+#     report = outcome.get_result()
+#
+#     if report.when == "call" and report.failed:
+#         client = docker.from_env()
+#
+#         containers = client.containers.list(filters={"label": "com.docker.compose.project"})
+#
+#         for container in containers:
+#             print(f"\n--- Logs: {container.name} ---")
+#             print(container.logs().decode("utf-8"))

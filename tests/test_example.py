@@ -16,7 +16,7 @@ def test_gds_admin_can_view_all_authorities(
 
     # Then
     # - The user should be correctly logged into signon
-    assert admin_app.verify_login_occurred_correctly(user)
+    admin_app.verify_login_occurred_correctly(user)
 
     # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID, logo
     assert "authorit" in admin_app.current_page_title().lower()
