@@ -13,14 +13,19 @@ class GovUkSignonMock:
         self.token_request = HttpRequest.request("/oauth/token").with_method("POST")
         self.user_details_request = HttpRequest.request("/user.json").with_method("GET")
 
-    def reset(self):
-        self.client.reset()
-
     def mock_gds_superuser_login(self):
         return self._mock_user_login(permissions={"Licensify": ["signin", "gdsadministrator"]})
 
+    def verify_signon_login_occurred_correctly(self):
+        auth_code_requests = self.client.retrieve_recorded_requests(self.authorize_request)
+        access_token_requests = self.client.retrieve_recorded_requests(self.token_request)
+        signon_user_data_requests = self.client.retrieve_recorded_requests(self.user_details_request)
+        assert len(auth_code_requests) == 1
+        assert len(access_token_requests) == 1
+        assert len(signon_user_data_requests) == 1
+
     def _mock_user_login(self, permissions: dict[str, list[str]] | list[str]):
-        self.reset()
+        self._reset()
 
         user = {
             "user": {
@@ -77,10 +82,5 @@ class GovUkSignonMock:
 
         return user
 
-    def verify_signon_login_occurred_correctly(self):
-        auth_code_requests = self.client.retrieve_recorded_requests(self.authorize_request)
-        access_token_requests = self.client.retrieve_recorded_requests(self.token_request)
-        signon_user_data_requests = self.client.retrieve_recorded_requests(self.user_details_request)
-        assert len(auth_code_requests) == 1
-        assert len(access_token_requests) == 1
-        assert len(signon_user_data_requests) == 1
+    def _reset(self):
+        self.client.reset()
