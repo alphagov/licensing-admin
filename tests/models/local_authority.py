@@ -2,8 +2,8 @@ import base64
 import random
 
 from faker import Faker
-from pymongo import MongoClient
 
+from models.base_factory import BaseFactory
 from models.payment_accounts import AuthorityPaymentAccountFactory
 
 fake = Faker("en_GB")
@@ -75,26 +75,16 @@ class LocalAuthority:
         }
 
 
-class LocalAuthorityFactory:
-    def __init__(self, db_url: str):
-        self._client = MongoClient(db_url)
-        self._database = self._client.get_default_database()["authorities"]
-        self._authority_payment_account = AuthorityPaymentAccountFactory(db_url)
+class LocalAuthorityFactory(BaseFactory):
+    collection_name = "authorities"
+    model = LocalAuthority
 
-    def __enter__(self):
-        return self
+    def __init__(self, db_url):
+        super().__init__(db_url)
+        self._payment_accounts = AuthorityPaymentAccountFactory(db_url)
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        self._client.close()
-
-    def create_x(self, x: int) -> list[LocalAuthority]:
-        local_authorities_created = []
-        for _ in range(x):
-            local_authority = LocalAuthority()
-            self._database.insert_one(local_authority.to_json())
-
-            payment_account = self._authority_payment_account.create(authority_url_slug=local_authority.url_slug)
-            local_authority.payment_provider = payment_account.payment_provider
-            local_authorities_created.append(local_authority)
-
-        return local_authorities_created
+    def create(self):
+        authority = super().create()
+        account = self._payment_accounts.create(authority_url_slug=authority.url_slug)
+        authority.payment_provider = account.payment_provider
+        return authority

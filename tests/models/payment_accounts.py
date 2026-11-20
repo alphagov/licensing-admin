@@ -3,7 +3,8 @@ from enum import StrEnum
 
 import bson
 from faker import Faker
-from pymongo import MongoClient
+
+from models.base_factory import BaseFactory
 
 fake = Faker("en_GB")
 
@@ -101,18 +102,6 @@ class AuthorityPaymentAccount:
         }
 
 
-class AuthorityPaymentAccountFactory:
-    def __init__(self, db_url: str):
-        self._client = MongoClient(db_url)
-        self._database = self._client.get_default_database()["paymentAccounts"]
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self._client.close()
-
-    def create(self, authority_url_slug: str | None = None) -> AuthorityPaymentAccount:
-        payment_account = AuthorityPaymentAccount(authority_url_slug=authority_url_slug)
-        self._database.insert_one(payment_account.to_json())
-        return payment_account
+class AuthorityPaymentAccountFactory(BaseFactory):
+    collection_name = "paymentAccounts"
+    model = AuthorityPaymentAccount
