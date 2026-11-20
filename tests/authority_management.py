@@ -40,7 +40,6 @@ def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
 
     # When:
     # - Try to navigate to authorities page
-
     admin_app.navigate_to_authorities()
 
     # Then:
