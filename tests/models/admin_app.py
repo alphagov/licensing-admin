@@ -27,7 +27,7 @@ class AdminApp:
         if not columns:
             raise ValueError("columns cannot be empty")
 
-        sort_key = sort_by or columns[0].header
+        sort_key = sort_by or columns[0].table_header
 
         raw_ui_rows = self._convert_html_table_to_pythonic_data_structure(table_test_id)
         normalized_ui_rows = normalize_ui_rows(raw_ui_rows, columns)

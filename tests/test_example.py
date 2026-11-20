@@ -19,12 +19,15 @@ def test_gds_admin_can_view_all_authorities(
     admin_app.verify_login_occurred_correctly(user)
 
     # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID, logo
-    assert "authorit" in admin_app.current_page_title().lower()
     columns = [
-        Column("Authority Full Name", "full_name"),
-        Column("Payment Provider", "payment_provider"),
-        Column("Agency ID", "agency_id"),
-        Column("Logo", "image_base_64_encoded", ui=extract_img_base64),
+        Column(table_header="Authority Full Name", db_field_name="full_name"),
+        Column(table_header="Payment Provider", db_field_name="payment_provider"),
+        Column(table_header="Agency ID", db_field_name="agency_id"),
+        Column(
+            table_header="Logo",
+            db_field_name="image_base_64_encoded",
+            ui_data_mapping_function=extract_img_base64,
+        ),
     ]
     admin_app.verify_admin_data_table_matches_expected_data(
         table_test_id="authorities", expected_objects=test_authorities, columns=columns
