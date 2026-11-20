@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 
-from authentication.models import AnonymousLicensifyUser, LicensifyUser
+from authentication.licensify_user import AnonymousLicensifyUser, LicensifyUser
 
 
 class LicensifyAuthMiddleware:
@@ -15,7 +15,6 @@ class LicensifyAuthMiddleware:
                 uid=user_dict["uid"],
                 email=user_dict["email"],
                 display_name=user_dict["display_name"],
-                # Freeze the permissions array into an immutable tuple:
                 permissions=tuple(user_dict.get("permissions", [])),
             )
         else:

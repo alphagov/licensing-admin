@@ -1,15 +1,10 @@
 from helpers.list_helpers import Column, extract_img_base64
 from models.admin_app import AdminApp
-from models.gov_uk_signon_mock import GovUkSignonMock
 from models.local_authority import LocalAuthorityFactory
 
 
-def test_has_title(admin_app: AdminApp) -> None:
-    assert admin_app.current_page_title() == "Hello World"
-
-
 def test_gds_admin_can_view_all_authorities(
-    admin_app: AdminApp, local_authority_factory: LocalAuthorityFactory, govuk_signon_mock: GovUkSignonMock
+    admin_app: AdminApp, local_authority_factory: LocalAuthorityFactory
 ) -> None:
     # Given:
     # - The database is populated with authorities
@@ -17,11 +12,11 @@ def test_gds_admin_can_view_all_authorities(
 
     # When:
     # - We login as a GDS superadmin user
-    admin_app.login_as_gds_superadmin()
+    user = admin_app.login_as_gds_superadmin()
 
     # Then
-    # - A call is made to sigon
-    assert govuk_signon_mock.verify_signon_login_called_x_times(1)
+    # - The user should be correctly logged into signon
+    assert admin_app.verify_login_occurred_correctly(user)
 
     # - The authorised GDS admin can view a list of all authorities including name, payment provider, agencyID, logo
     assert "authorit" in admin_app.current_page_title().lower()
