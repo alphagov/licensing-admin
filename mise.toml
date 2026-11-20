@@ -8,7 +8,6 @@ python.uv_venv_auto = "source"
 [env]
 IS_PRODUCTION = "True"
 DJANGO_SECRET_KEY = "django-insecure-)_*-zeg)shi6!y!lufkmy_g8&6%s!0pk=d1erm)rgbchgqfa($"
-CITIZEN_FRONTEND_PORT = "8000"
 DOCUMENTDB_USER = "docdb"
 DOCUMENTDB_PASSWORD = "MX78weVPvR7a7wyJ"
 DOCUMENTDB_PORT = "10260" # The port to bind to the documentDB endpoint to on your local machine
@@ -20,5 +19,4 @@ SIGNON_AUTH_CODE_REQUEST_URL = ""
 ADMIN_APP_AUTH_CODE_RESPONSE_URL = ""
 SIGNON_ACCESS_TOKEN_REQUEST_URL = ""
 SIGNON_USER_DETAILS_URL = ""
-OAUTH_CALLBACK_URL_OVERRIDE = ""
 SESSION_COOKIE_AGE = 2700
