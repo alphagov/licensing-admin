@@ -1,9 +1,16 @@
 repos:
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.21
-  hooks:
-    - id: ruff-check
-      args: [ --fix ]
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: mise exec -- uv run ruff check --fix
+        language: system
+        types_or: [ python, pyi ]
+        require_serial: true
 
-    - id: ruff-format
-  
+      - id: ruff-format
+        name: ruff format
+        entry: mise exec -- uv run ruff format
+        language: system
+        types_or: [ python, pyi ]
+        require_serial: true

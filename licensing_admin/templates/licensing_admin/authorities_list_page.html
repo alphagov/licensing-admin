@@ -1,0 +1,31 @@
+{% extends "licensing_admin/base.html" %}
+{% block title %}Authorities{% endblock %}
+{% block content %}
+    <p>AUTHORITIES</p>
+    <table data-testid="authorities">
+        <thead>
+        <tr>
+            <th>Authority Full Name</th>
+            <th>Agency ID</th>
+            <th>Payment Provider</th>
+            <th>Logo</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for authority in authorities %}
+            <tr>
+                <td>{{ authority.full_name }}</td>
+                <td>{{ authority.agency_id }}</td>
+                <td>{{ authority.payment_account.payment_provider }}</td>
+                <td><img
+                        src="data:image/png;base64,{{ authority.encoded_image }}"
+                        alt="{{ authority.full_name }} logo"
+                ></td>
+                <td>Actions will live here</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock %}

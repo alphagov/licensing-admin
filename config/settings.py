@@ -23,10 +23,7 @@ sys.path.insert(0, str(BASE_DIR / "licensing_common"))
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-)_*-zeg)shi6!y!lufkmy_g8&6%s!0pk=d1erm)rgbchgqfa($",
-)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("IS_PRODUCTION", "true").lower() not in ["true", "1", "t", "yes"]
@@ -36,16 +33,14 @@ ALLOWED_HOSTS = os.environ.get(
     "localhost,127.0.0.1,[::1]",
 ).split(",")
 
-
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "common",
+    "licensing_admin",
 ]
 
 MIDDLEWARE = [
@@ -53,7 +48,10 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Replaces AuthenticationMiddleware: Populates request.user from cookie data
+    "authentication.middleware.LicensifyAuthMiddleware",
+    # Enforces GDS Admin / Authority isolation before view code runs
+    "authentication.middleware.ViewPermissionEnforcementMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -76,7 +74,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
@@ -101,25 +98,6 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django_mongodb_backend.fields.ObjectIdAutoField"
 
-# Password validation
-# https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
@@ -131,10 +109,24 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Auth cookie
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = int(os.environ.get("SESSION_COOKIE_AGE", str(45 * 60)))
+SESSION_COOKIE_NAME = "licensify_session"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"  # Needed because gov signon itself is external
+
+SIGNON_CLIENT_ID = os.environ["SIGNON_CLIENT_ID"]
+SIGNON_CLIENT_SECRET = os.environ["SIGNON_CLIENT_SECRET"]
+SIGNON_AUTH_CODE_REQUEST_URL = os.environ["SIGNON_AUTH_CODE_REQUEST_URL"]
+ADMIN_APP_AUTH_CODE_RESPONSE_URL = os.environ["ADMIN_APP_AUTH_CODE_RESPONSE_URL"]
+SIGNON_ACCESS_TOKEN_REQUEST_URL = os.environ["SIGNON_ACCESS_TOKEN_REQUEST_URL"]
+SIGNON_USER_DETAILS_URL = os.environ["SIGNON_USER_DETAILS_URL"]
