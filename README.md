@@ -1,4 +1,5 @@
 # Licensing Admin
+
 Licensing admin application to manage licence applications
 
 ## Set up
@@ -10,29 +11,33 @@ Licensing admin application to manage licence applications
 - DJANGO_SECRET_KEY
 - DOCUMENTDB_ALLOW_INVALID_CERTS = "true"
 - DOCUMENTDB_IMAGE
-    - Used by the `licensing_common` Git submodule to provide a DocumentDB service when running the system 
-    on a local machine
+    - Used by the `licensing_common` Git submodule to provide a DocumentDB service when running the system
+      on a local machine
 - DOCUMENTDB_PASSWORD
 - DOCUMENTDB_PORT
 - DOCUMENTDB_USER
-- IS_PRODUCTION 
+- IS_PRODUCTION
 - SESSION_COOKIE_AGE
     - Specified in seconds
+- SIGNON_ACCESS_TOKEN_REQUEST_URL = ""
+- SIGNON_AUTH_CODE_REQUEST_URL = ""
 - SIGNON_CLIENT_ID
 - SIGNON_CLIENT_SECRET = "dev-client-secret"
-- SIGNON_AUTH_CODE_REQUEST_URL = ""
-- SIGNON_ACCESS_TOKEN_REQUEST_URL = ""
+- SIGNON_LOGOUT_URL = ""
 - SIGNON_USER_DETAILS_URL = ""
 
 ## Mise
 
 This repository uses [mise](https://mise.jdx.dev/) to manage tool versions and environment variables.
 
-After installing mise, you should set up your shell to automatically activate mise following [these instructions](https://mise.jdx.dev/installing-mise.html#shell-specific-installation-activation), then run `mise install` and `mise trust`.
+After installing mise, you should set up your shell to automatically activate mise
+following [these instructions](https://mise.jdx.dev/installing-mise.html#shell-specific-installation-activation), then
+run `mise install` and `mise trust`.
 
 ## UV
 
-This repository uses `uv` to manage packages and dependencies. Run `make prepare` to install all necessary packages and dependencies needed
+This repository uses `uv` to manage packages and dependencies. Run `make prepare` to install all necessary packages and
+dependencies needed
 to test and run this project.
 
 The python virtual environment should be automatically activated by mise. If it hasn't, run `source .venv/bin/activate`.

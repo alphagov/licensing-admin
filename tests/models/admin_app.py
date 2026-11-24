@@ -3,7 +3,7 @@ from operator import itemgetter
 from bs4 import BeautifulSoup
 from django.core import signing
 from helpers.list_helpers import Column, extract_db_rows, normalize_ui_rows
-from playwright.sync_api import Page
+from playwright.sync_api import Cookie, Page
 
 from models.gov_uk_signon_mock import GovUkSignonMock
 
@@ -47,6 +47,9 @@ class AdminApp:
         self.browser.get_by_test_id("login").click()
         return user
 
+    def log_out_current_user(self):
+        self.browser.get_by_test_id("logout").click()
+
     def navigate_to_authorities(self):
         self._navigate_to("authorities")
 
@@ -58,38 +61,13 @@ class AdminApp:
         self.govuk_signon_mock.verify_signon_login_occurred_correctly()
         self._verify_signon_user_session_cookie_set_correctly(user)
 
+    def verify_user_logged_out_correctly(self):
+        self._verify_licensify_session_ended()
+        self.govuk_signon_mock.verify_signon_logout_called()
+
     ###########################
     ##### PRIVATE METHODS #####
     ###########################
-
-    def _verify_signon_user_session_cookie_set_correctly(self, expected_user):
-        __tracebackhide__ = True
-        cookies = self.browser.context.cookies()
-        session_cookie = next(
-            (c for c in cookies if c["name"] == "licensify_session"),
-            None,
-        )
-        assert session_cookie is not None, "licensify_session cookie not found"
-
-        assert session_cookie["httpOnly"] is True
-        assert session_cookie["sameSite"] == "Lax"
-
-        # Decode without touching django.conf.settings
-        session_data = signing.loads(
-            session_cookie["value"],
-            key="thisisverysecret",
-            salt="django.contrib.sessions.backends.signed_cookies",
-            serializer=signing.JSONSerializer,
-            max_age=45 * 60,
-            fallback_keys=[],
-        )
-
-        assert session_data["signon_user"] == {
-            "uid": expected_user["user"]["uid"],
-            "email": expected_user["user"]["email"],
-            "display_name": expected_user["user"]["name"],
-            "permissions": expected_user["user"]["permissions"]["Licensify"],
-        }
 
     def _navigate_to(self, page: str):
         self.browser.goto(f"{self.app_url}/{page}")
@@ -111,3 +89,43 @@ class AdminApp:
             results.append(dict(zip(headers, cells, strict=True)))
 
         return results
+
+    def _verify_licensify_session_ended(self):
+        session_cookie = self._find_licensify_cookie()
+        assert session_cookie is None
+
+    def _verify_signon_user_session_cookie_set_correctly(self, expected_user):
+        __tracebackhide__ = True
+        session_cookie = self._find_licensify_cookie()
+        assert session_cookie is not None, "licensify_session cookie not found"
+        assert session_cookie["httpOnly"] is True
+        assert session_cookie["sameSite"] == "Lax"
+
+        session_data = self._get_session_data(session_cookie)
+
+        assert session_data["signon_user"] == {
+            "uid": expected_user["user"]["uid"],
+            "email": expected_user["user"]["email"],
+            "display_name": expected_user["user"]["name"],
+            "permissions": expected_user["user"]["permissions"]["Licensify"],
+        }
+
+    def _find_licensify_cookie(self) -> Cookie | None:
+        cookies = self.browser.context.cookies()
+        session_cookie = next(
+            (c for c in cookies if c["name"] == "licensify_session"),
+            None,
+        )
+
+        return session_cookie
+
+    def _get_session_data(self, session_cookie):
+        # Decode without touching django.conf.settings
+        return signing.loads(
+            session_cookie["value"],
+            key="thisisverysecret",
+            salt="django.contrib.sessions.backends.signed_cookies",
+            serializer=signing.JSONSerializer,
+            max_age=45 * 60,
+            fallback_keys=[],
+        )

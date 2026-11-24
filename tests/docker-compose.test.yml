@@ -20,6 +20,7 @@ services:
       SIGNON_USER_DETAILS_URL: http://mockserver:1080/user.json
       SIGNON_CLIENT_ID: test-client-id
       SIGNON_CLIENT_SECRET: test-client-secret
+      SIGNON_LOGOUT_URL: http://localhost:1080/users/sign_out
       DJANGO_SECRET_KEY: thisisverysecret
     depends_on:
       - mockserver

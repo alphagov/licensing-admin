@@ -1,0 +1,8 @@
+<form method="post" action="{% url 'logout' %}" class="govuk-service-navigation__form">
+    {% csrf_token %}
+    <button type="submit" data-testid="logout"
+            class="govuk-service-navigation__link govuk-service-navigation__button-link">
+        Log out
+    </button>
+</form>
+<br/> <br/>

@@ -12,6 +12,7 @@ class GovUkSignonMock:
         self.authorize_request = HttpRequest.request("/oauth/authorize").with_method("GET")
         self.token_request = HttpRequest.request("/oauth/token").with_method("POST")
         self.user_details_request = HttpRequest.request("/user.json").with_method("GET")
+        self.logout_request = HttpRequest.request("/users/sign_out").with_method("GET")
 
     def mock_gds_superuser_login(self):
         return self._mock_user_login(permissions={"Licensify": ["signin", "gdsadministrator"]})
@@ -23,6 +24,9 @@ class GovUkSignonMock:
         assert len(auth_code_requests) == 1
         assert len(access_token_requests) == 1
         assert len(signon_user_data_requests) == 1
+
+    def verify_signon_logout_called(self):
+        assert len(self.client.retrieve_recorded_requests(self.logout_request)) == 1
 
     def _mock_user_login(self, permissions: dict[str, list[str]] | list[str]):
         self._reset()
