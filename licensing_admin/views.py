@@ -45,6 +45,5 @@ def authorities_list(request):
 
 @require_POST
 def logout(request):
-    # Wipes the session data and deletes the sessionid cookie in the browser
     request.session.flush()
     return redirect(settings.SIGNON_LOGOUT_URL)
