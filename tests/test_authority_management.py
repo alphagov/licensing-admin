@@ -45,3 +45,19 @@ def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
     # Then:
     # - Redirected to the login page
     assert "login" in admin_app.current_page_title().lower()
+
+
+def test_logged_in_user_that_logs_out_is_logged_out_correctly(admin_app: AdminApp):
+    # Given:
+    # - User logged in
+    user = admin_app.login_as_gds_superadmin()
+
+    # When
+    # - user signs out
+    admin_app.log_out_current_user()
+
+    # Then
+    # - The users current session is cleared, and they're redirected to signon's sign out functionality
+    # get current licensify user which either should be null or maybe anonymous user
+    # assert the signon mock recieved a request to log the user out
+    admin_app.verify_user_logged_out_correctly(user)

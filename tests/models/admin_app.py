@@ -1,3 +1,4 @@
+import os
 from operator import itemgetter
 
 from bs4 import BeautifulSoup
@@ -61,9 +62,11 @@ class AdminApp:
         self.govuk_signon_mock.verify_signon_login_occurred_correctly()
         self._verify_signon_user_session_cookie_set_correctly(user)
 
-    def verify_user_logged_out_correctly(self):
-        self._verify_licensify_session_ended()
+    def verify_user_logged_out_correctly(self, original_user):
+        self._verify_authenticated_licensify_session_ended(original_user)
         self.govuk_signon_mock.verify_signon_logout_called()
+        expected_logout_url = os.environ.get("SIGNON_LOGOUT_URL") or "http://localhost:1080/users/sign_out"
+        assert self.browser.url == expected_logout_url
 
     ###########################
     ##### PRIVATE METHODS #####
@@ -90,7 +93,8 @@ class AdminApp:
 
         return results
 
-    def _verify_licensify_session_ended(self):
+    def _verify_authenticated_licensify_session_ended(self, original_user):
+        assert original_user is not None  # can't verify logout happened if someone wasn't logged in
         session_cookie = self._find_licensify_cookie()
         assert session_cookie is None
 
