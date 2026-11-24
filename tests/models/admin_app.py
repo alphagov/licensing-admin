@@ -63,6 +63,7 @@ class AdminApp:
         self._verify_signon_user_session_cookie_set_correctly(user)
 
     def verify_user_logged_out_correctly(self, original_user):
+        """Verifies the users current session is cleared, and they're redirected to signon's sign out functionality"""
         self._verify_authenticated_licensify_session_ended(original_user)
         self.govuk_signon_mock.verify_signon_logout_called()
         expected_logout_url = os.environ.get("SIGNON_LOGOUT_URL") or "http://localhost:1080/users/sign_out"
