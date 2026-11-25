@@ -24,8 +24,13 @@ class LicensifyUser:
     def is_gds_admin(self) -> bool:
         return "gdsadministrator" in self.permissions
 
+    @property
+    def authorities(self) -> frozenset[str]:
+        return frozenset(self.permissions) - SPECIAL_PERMISSIONS
+
 
 @dataclass(frozen=True)
 class AnonymousLicensifyUser:
     is_authenticated: bool = False
     is_gds_admin: bool = False
+    authorities: frozenset[str] = frozenset()

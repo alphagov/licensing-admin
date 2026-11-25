@@ -30,12 +30,28 @@ class ViewPermissionEnforcementMiddleware:
     def __call__(self, request):
         return self.get_response(request)
 
+    def _home_redirect(self, request):
+        if request.user.is_gds_admin:
+            return redirect("authorities_list")
+        if len(request.user.authorities) > 0:
+            first_authority = next(iter(request.user.authorities))
+            return redirect("applications_list", authority_slug=first_authority)
+        return redirect("/login")
+
     def process_view(self, request, view_func, view_args, view_kwargs):
-        # Exempt public views (marked with @public_view) - notably the login page or the callback from login
         if getattr(view_func, "_is_public", False):
             return None
 
         if not request.user.is_authenticated:
             return redirect("/login")
 
-        return None
+        is_gds_admin_view = getattr(view_func, "_is_gds_admin", False)
+        is_local_authority_view = getattr(view_func, "_is_local_authority", False)
+
+        if request.user.is_gds_admin:
+            return None if is_gds_admin_view else self._home_redirect(request)
+
+        if len(request.user.authorities) > 0:
+            return None if is_local_authority_view else self._home_redirect(request)
+
+        return redirect("/login")

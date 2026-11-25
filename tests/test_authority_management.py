@@ -47,9 +47,32 @@ def test_unauthorised_user_is_redirected_to_login(admin_app: AdminApp):
     assert "login" in admin_app.current_page_title().lower()
 
 
+def test_authorised_user_without_gds_administrator_privileges_is_immediately_redirected(
+    admin_app: AdminApp,
+    local_authority_factory: LocalAuthorityFactory,
+):
+    # Given:
+    # - Signed in as local authority for barnet and authority data exists
+    user = admin_app.login_as_local_administrator_for_barnet()
+    local_authority_factory.create_x(1)
+
+    # When:
+    # - Try to navigate to authorities page
+    with admin_app.browser.expect_response(lambda res: "/authorities" in res.url) as response_info:
+        admin_app.navigate_to_authorities()
+
+    initial_response = response_info.value
+
+    # Then:
+    # - User is redirected without authority page ever returning data
+    admin_app.verify_login_occurred_correctly(user)
+    assert initial_response.status in (302, 303)
+    assert "authorities" not in admin_app.browser.url
+
+
 def test_logged_in_user_that_logs_out_is_logged_out_correctly(admin_app: AdminApp):
     # Given:
-    # - User logged in
+    # - User logged in as gds admin
     user = admin_app.login_as_gds_superadmin()
 
     # When

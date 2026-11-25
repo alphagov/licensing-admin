@@ -18,7 +18,6 @@ def test_logged_in_user_that_logs_out_is_logged_out_correctly(admin_app: AdminAp
     # Given:
     # - User logged in
     user = admin_app.login_as_local_administrator_for_barnet()
-    admin_app.verify_login_occurred_correctly(user)
     # When
     # - The user signs out
     admin_app.log_out_current_user()
