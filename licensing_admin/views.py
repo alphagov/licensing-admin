@@ -33,6 +33,7 @@ def oauth_callback(signon_auth_code_response):
     )
 
 
+@require_GET
 def authorities_list(request):
     authorities = list(Authority.objects.select_related("payment_account"))
 
@@ -40,6 +41,15 @@ def authorities_list(request):
         request,
         "licensing_admin/authorities_list_page.html",
         context={"authorities": authorities},
+    )
+
+
+@require_GET
+def applications_list(request):
+    return render(
+        request,
+        "licensing_admin/applications_list_page.html",
+        context={"applications": []},
     )
 
 
