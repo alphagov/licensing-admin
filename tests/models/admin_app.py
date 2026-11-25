@@ -48,6 +48,12 @@ class AdminApp:
         self.browser.get_by_test_id("login").click()
         return user
 
+    def login_as_local_administrator_for_barnet(self):
+        user = self.govuk_signon_mock.mock_local_authority_for_barnet()
+        self.browser.goto(f"{self.app_url}/login")
+        self.browser.get_by_test_id("login").click()
+        return user
+
     def log_out_current_user(self):
         self.browser.get_by_test_id("logout").click()
 

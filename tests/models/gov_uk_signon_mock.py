@@ -17,6 +17,9 @@ class GovUkSignonMock:
     def mock_gds_superuser_login(self):
         return self._mock_user_login(permissions={"Licensify": ["signin", "gdsadministrator"]})
 
+    def mock_local_authority_for_barnet(self):
+        return self._mock_user_login(permissions={"Licensify": ["signin", "barnet"]})
+
     def verify_signon_login_occurred_correctly(self):
         auth_code_requests = self.client.retrieve_recorded_requests(self.authorize_request)
         access_token_requests = self.client.retrieve_recorded_requests(self.token_request)
