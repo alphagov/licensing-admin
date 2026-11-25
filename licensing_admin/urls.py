@@ -8,5 +8,5 @@ urlpatterns = [
     path("signon/login", signon_login, name="signon_login"),
     path("oauth", oauth_callback, name="oauth_callback"),
     path("authorities", authorities_list, name="authorities_list"),
-    path("all-applications", applications_list, name="applications_list"),
+    path("<str:authority_slug>/all-applications", applications_list, name="applications_list"),
 ]
