@@ -1,10 +1,10 @@
-import os
 from operator import itemgetter
 
 from bs4 import BeautifulSoup
 from django.core import signing
 from helpers.list_helpers import Column, extract_db_rows, normalize_ui_rows
 from playwright.sync_api import Cookie, Page
+from test_environment import test_env
 
 from models.gov_uk_signon_mock import GovUkSignonMock
 
@@ -66,8 +66,7 @@ class AdminApp:
         """Verifies the users current session is cleared, and they're redirected to signon's sign out functionality"""
         self._verify_authenticated_licensify_session_ended(original_user)
         self.govuk_signon_mock.verify_signon_logout_called()
-        expected_logout_url = os.environ.get("SIGNON_LOGOUT_URL")
-        assert self.browser.url == expected_logout_url
+        assert self.browser.url == test_env["SIGNON_LOGOUT_URL"]
 
     ###########################
     ##### PRIVATE METHODS #####
@@ -128,7 +127,7 @@ class AdminApp:
         # Decode without touching django.conf.settings
         return signing.loads(
             session_cookie["value"],
-            key="thisisverysecret",
+            key=test_env["DJANGO_SECRET_KEY"],
             salt="django.contrib.sessions.backends.signed_cookies",
             serializer=signing.JSONSerializer,
             max_age=45 * 60,

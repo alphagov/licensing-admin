@@ -8,6 +8,7 @@ from models.admin_app import AdminApp
 from models.gov_uk_signon_mock import GovUkSignonMock
 from models.local_authority import LocalAuthorityFactory
 from playwright.sync_api import Page
+from test_environment import test_env
 from testcontainers.compose import DockerCompose
 
 
@@ -36,7 +37,8 @@ def govuk_signon_mock(test_environment: DockerCompose) -> GovUkSignonMock:
 @pytest.fixture(scope="session")
 def local_authority_factory(test_environment: DockerCompose) -> Generator[LocalAuthorityFactory]:
     host_port = test_environment.get_service_port("document_db", 10260)
-    db_url = f"mongodb://docdb:password@localhost:{host_port}/licensify?authSource=admin"
+    creds = f"{test_env['DOCUMENTDB_USER']}:{test_env['DOCUMENTDB_PASSWORD']}"
+    db_url = f"mongodb://{creds}@localhost:{host_port}/licensify?authSource=admin"
     with LocalAuthorityFactory(db_url) as factory:
         yield factory
 
