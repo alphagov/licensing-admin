@@ -58,5 +58,4 @@ def test_logged_in_user_that_logs_out_is_logged_out_correctly(admin_app: AdminAp
 
     # Then
     # - The user is no longer logged in to the system and has left authorities page
-    admin_app.verify_user_logged_out_correctly(user)
-    assert "authorities" not in admin_app.browser.url
+    admin_app.verify_user_logged_out_and_redirected_correctly(user)
