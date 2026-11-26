@@ -5,22 +5,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    env_file: test.env
     environment:
-      DOCUMENTDB_HOST: document_db
-      DOCUMENTDB_PORT: "10260"
-      DOCUMENTDB_USER: docdb
-      DOCUMENTDB_PASSWORD: password
-      DOCUMENTDB_ALLOW_INVALID_CERTS: "true"
-      DJANGO_ALLOWED_HOSTS: "*"
-      IS_PRODUCTION: "false"
       PYTHONUNBUFFERED: "1"
-      SIGNON_AUTH_CODE_REQUEST_URL: http://localhost:1080/oauth/authorize
-      ADMIN_APP_AUTH_CODE_RESPONSE_URL: http://localhost:8000/oauth
-      SIGNON_ACCESS_TOKEN_REQUEST_URL: http://mockserver:1080/oauth/token
-      SIGNON_USER_DETAILS_URL: http://mockserver:1080/user.json
-      SIGNON_CLIENT_ID: test-client-id
-      SIGNON_CLIENT_SECRET: test-client-secret
-      DJANGO_SECRET_KEY: thisisverysecret
     depends_on:
       - mockserver
       - document_db
@@ -35,6 +22,7 @@ services:
 
   document_db:
     image: ghcr.io/documentdb/documentdb/documentdb-local:latest
+    # Must match DOCUMENTDB_USER and  DOCUMENTDB_PASSWORD in test.env
     environment:
       - USERNAME=docdb
       - PASSWORD=password
