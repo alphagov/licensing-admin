@@ -71,11 +71,11 @@ class AdminApp:
         self.govuk_signon_mock.verify_signon_login_occurred_correctly()
         self._verify_signon_user_session_cookie_set_correctly(user)
 
-    def verify_user_logged_out_correctly(self, original_user):
+    def verify_user_logged_out_and_redirected_correctly(self, original_user):
         """Verifies the users current session is cleared, and they're redirected to signon's sign out functionality"""
         self._verify_authenticated_licensify_session_ended(original_user)
         self.govuk_signon_mock.verify_signon_logout_called()
-        assert self.browser.url == test_env["SIGNON_LOGOUT_URL"]
+        assert self.browser.url == "http://localhost:1080/users/sign_out"
 
     ###########################
     ##### PRIVATE METHODS #####
