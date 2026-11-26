@@ -54,6 +54,9 @@ class AdminApp:
     def navigate_to_authorities(self):
         self._navigate_to("authorities")
 
+    def navigate_to_applications(self):
+        self._navigate_to("barnet/all-applications")
+
     def navigate_to_licences(self):
         self._navigate_to("licences")
 
