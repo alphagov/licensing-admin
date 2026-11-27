@@ -6,7 +6,7 @@ from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from authentication.decorators import public_view
+from authentication.decorators import gds_admin_view, local_authority_view, public_view
 from authentication.signon.signon_authorisation_code import SignonAuthorisationCode
 from config import settings
 
@@ -33,6 +33,7 @@ def oauth_callback(signon_auth_code_response):
     )
 
 
+@gds_admin_view
 @require_GET
 def authorities_list(request):
     authorities = list(Authority.objects.select_related("payment_account"))
@@ -44,8 +45,9 @@ def authorities_list(request):
     )
 
 
+@local_authority_view
 @require_GET
-def applications_list(request):
+def applications_list(request, authority_slug):
     return render(
         request,
         "licensing_admin/applications_list_page.html",
@@ -53,6 +55,7 @@ def applications_list(request):
     )
 
 
+@public_view
 @require_POST
 def logout(request):
     request.session.flush()
